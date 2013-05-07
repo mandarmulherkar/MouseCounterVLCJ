@@ -34,12 +34,11 @@ public class Player {
             }
         });
         
-        System.out.println("here");
     }
 
     private Player(String[] args) {
 
-    	JFrame frame = new JFrame("vlcj Tutorial");
+    	JFrame frame = new JFrame("MouseCounter");
 
         MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory();
 
