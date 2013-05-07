@@ -33,6 +33,7 @@ public class Player {
                 System.out.println(""+test);
             }
         });
+        
         System.out.println("here");
     }
 
