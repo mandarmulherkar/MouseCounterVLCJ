@@ -37,7 +37,8 @@ public class Player {
     }
 
     private Player(String[] args) {
-        JFrame frame = new JFrame("vlcj Tutorial");
+
+    	JFrame frame = new JFrame("vlcj Tutorial");
 
         MediaPlayerFactory mediaPlayerFactory = new MediaPlayerFactory();
 
