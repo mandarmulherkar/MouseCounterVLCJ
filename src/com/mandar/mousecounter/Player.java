@@ -1,5 +1,8 @@
 package com.mandar.mousecounter;
-
+/**
+ * More info here 
+ * http://svn.openstreetmap.org/applications/editors/josm/plugins/videomapping/src/org/openstreetmap/josm/plugins/videomapping/video/SimpleVideoPlayer.java?p=24624
+ */
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
