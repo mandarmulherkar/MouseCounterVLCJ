@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="libs/jna-3.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/platform-3.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/vlcj-2.3.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="icons/icons.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
