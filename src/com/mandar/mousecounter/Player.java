@@ -2,6 +2,13 @@ package com.mandar.mousecounter;
 /**
  * More info here 
  * http://svn.openstreetmap.org/applications/editors/josm/plugins/videomapping/src/org/openstreetmap/josm/plugins/videomapping/video/SimpleVideoPlayer.java?p=24624
+ * 
+ * VLC Command line (for audio and other uses) 
+ * http://wiki.videolan.org/VLC_command-line_help
+ * 
+ * Interesting audio visualization
+ * https://github.com/caprica/vlcj/blob/master/src/test/java/uk/co/caprica/vlcj/test/visualisation/VisualisationPlayer.java
+ * 
  */
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -34,6 +41,7 @@ import com.sun.jna.NativeLibrary;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Button;
+import java.awt.Toolkit;
 
 public class Player {
 
@@ -69,11 +77,12 @@ public class Player {
                 "--audio-visual=visual",
                 "--intf",
                 "dummy"};
-		 
+		//"--audio-visual=visual",
 		// Create a factory instance (once), you can keep a reference to this
 		mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
 		   
 		JFrame frame = new JFrame("MouseCounter");
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Player.class.getResource("/icons/Rat.ico")));
     	frame.getContentPane().setFont(new Font("Helvetica", Font.PLAIN, 13));
     	frame.setFont(new Font("Helvetica", Font.PLAIN, 12));
     	JPanel playerPanel = new JPanel(new BorderLayout());
@@ -303,6 +312,9 @@ public class Player {
         gbc_lblValue.gridx = 0;
         gbc_lblValue.gridy = 4;
         currentValuesPanel.add(lblValue, gbc_lblValue);
+        
+        JPanel panel_1 = new JPanel();
+        playerPanel.add(panel_1, BorderLayout.SOUTH);
         
         JPanel videoControlPanel = new JPanel();
         videoControlPanel.setBorder(BorderFactory.createTitledBorder("Video Controls"));
