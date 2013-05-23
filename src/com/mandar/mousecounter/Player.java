@@ -11,6 +11,7 @@ package com.mandar.mousecounter;
  * 
  */
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -18,6 +19,10 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -38,16 +43,14 @@ import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Button;
-import java.awt.Toolkit;
 
 public class Player {
 
 	private static EmbeddedMediaPlayer mediaPlayer = null;
 	private MediaPlayerFactory mediaPlayerFactory = null;
-    
+	private MenuClass menuClass;
+	private JFrame mainFrame;
+	private JButton btnPlaypauserecord;
 	
     public static void main(final String[] args) {
         NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
@@ -57,50 +60,64 @@ public class Player {
             @Override
             public void run() {
                 new Player(args);
-
-                boolean test = mediaPlayer.playMedia("/Users/mulherka/Downloads/bailey.mpg");
-                System.out.println(""+test);
             }
         });
-        
     }
 
 	private Player(String[] args) {
-
-		// Set some options for libvlc
-		String[] libvlcArgs = {"--vout=macosx",
-                "--no-plugins-cache",
-                "--no-video-title-show",
-                "--no-snapshot-preview",
-                "--quiet",
-                "--quiet-synchro",
-                "--audio-visual=visual",
-                "--intf",
-                "dummy"};
-		//"--audio-visual=visual",
-		// Create a factory instance (once), you can keep a reference to this
-		mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
-		   
-		JFrame frame = new JFrame("MouseCounter");
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Player.class.getResource("/icons/Rat.ico")));
-    	frame.getContentPane().setFont(new Font("Helvetica", Font.PLAIN, 13));
-    	frame.setFont(new Font("Helvetica", Font.PLAIN, 12));
+		mainFrame = createMainFrame();
     	JPanel playerPanel = new JPanel(new BorderLayout());
-    	playerPanel.setBorder(BorderFactory.createTitledBorder("VLC Player"));
-    	
+    	Canvas canvas = createCanvas(mainFrame, playerPanel);
+        createGUI(mainFrame, playerPanel);
+        createMediaPlayer(mainFrame, canvas);
+	}
+
+	private void createMediaPlayer(JFrame frame, Canvas canvas) {
+		// Set some options for libvlc
+				String[] libvlcArgs = {"--vout=macosx",
+		                "--no-plugins-cache",
+		                "--no-video-title-show",
+		                "--no-snapshot-preview",
+		                "--quiet",
+		                "--quiet-synchro",
+		                "--intf",
+		                "dummy"};
+				//"--audio-visual=visual",
+		// Create a factory instance (once), you can keep a reference to this
+		//uncomment
+		//mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
+		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(frame);
+        mediaPlayer = mediaPlayerFactory.newEmbeddedMediaPlayer(fullScreenStrategy);
+		mediaPlayer.setVideoSurface(mediaPlayerFactory.newVideoSurface(canvas));
+
+	}
+
+	private Canvas createCanvas(JFrame frame, JPanel playerPanel) {
+		playerPanel.setBorder(BorderFactory.createTitledBorder("VLC Player"));
     	Canvas canvas = new Canvas();
         canvas.setFont(new Font("Helvetica", Font.PLAIN, 12));
         canvas.setSize(640, 480);
         canvas.setBackground(Color.black);
         playerPanel.add(canvas);
         frame.getContentPane().add(playerPanel);
+		return canvas;
+	}
 
-        FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(frame);
+	private JFrame createMainFrame() {
 
-        mediaPlayer = mediaPlayerFactory.newEmbeddedMediaPlayer(fullScreenStrategy);
-		mediaPlayer.setVideoSurface(mediaPlayerFactory.newVideoSurface(canvas));
-        
-        JPanel panel = new JPanel();
+		JFrame frame = new JFrame("MouseCounter");
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Player.class.getResource("/icons/Rat.ico")));
+    	frame.getContentPane().setFont(new Font("Helvetica", Font.PLAIN, 13));
+    	frame.setFont(new Font("Helvetica", Font.PLAIN, 12));
+    	
+    	menuClass = new MenuClass(frame, mediaPlayer);
+    	menuClass.buildMenu();
+    	
+		return frame;
+	}
+
+	private void createGUI(JFrame frame, JPanel playerPanel) {
+		JPanel panel = new JPanel();
         playerPanel.add(panel, BorderLayout.EAST);
         GridBagLayout gbl_panel = new GridBagLayout();
         gbl_panel.columnWidths = new int[]{0, 0, 0, 0};
@@ -174,6 +191,7 @@ public class Player {
         JButton btnNewButton_4 = new JButton("Lift");
         btnNewButton_4.setIcon(new ImageIcon(Player.class.getResource("/icons/lift.png")));
         GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
+        gbc_btnNewButton_4.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewButton_4.gridx = 2;
         gbc_btnNewButton_4.gridy = 2;
@@ -197,6 +215,11 @@ public class Player {
         activityButtonsPanel.add(spinner, gbc_spinner);
         
         JButton btnNewBehavior = new JButton("New Behavior");
+        btnNewBehavior.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		
+        	}
+        });
         GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
         gbc_btnNewBehavior.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewBehavior.gridwidth = 2;
@@ -205,16 +228,13 @@ public class Player {
         gbc_btnNewBehavior.gridy = 4;
         activityButtonsPanel.add(btnNewBehavior, gbc_btnNewBehavior);
         
-        JButton btnPlaypauserecord = new JButton("play/pause/record");
+        btnPlaypauserecord = new JButton("Start Record");
         btnPlaypauserecord.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		if(mediaPlayer.isPlaying()){
-        			mediaPlayer.pause();
-        		}else{
-        			mediaPlayer.play();
-        		}
+        		playPauseRecord();
         	}
         });
+        
         GridBagConstraints gbc_btnPlaypauserecord = new GridBagConstraints();
         gbc_btnPlaypauserecord.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnPlaypauserecord.gridwidth = 2;
@@ -239,9 +259,9 @@ public class Player {
         gbc_panel_1.gridy = 8;
         panel.add(currentValuesPanel, gbc_panel_1);
         GridBagLayout gbl_currentValuesPanel = new GridBagLayout();
-        gbl_currentValuesPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
+        gbl_currentValuesPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
         gbl_currentValuesPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-        gbl_currentValuesPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_currentValuesPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_currentValuesPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         currentValuesPanel.setLayout(gbl_currentValuesPanel);
         
@@ -255,8 +275,9 @@ public class Player {
         
         JLabel startTimeValue = new JLabel("0");
         GridBagConstraints gbc_startTimeValue = new GridBagConstraints();
+        gbc_startTimeValue.gridwidth = 3;
         gbc_startTimeValue.insets = new Insets(0, 0, 5, 5);
-        gbc_startTimeValue.gridx = 2;
+        gbc_startTimeValue.gridx = 1;
         gbc_startTimeValue.gridy = 0;
         currentValuesPanel.add(startTimeValue, gbc_startTimeValue);
         
@@ -270,8 +291,9 @@ public class Player {
         
         JLabel stopTimeValue = new JLabel("0");
         GridBagConstraints gbc_stopTimeValue = new GridBagConstraints();
+        gbc_stopTimeValue.gridwidth = 3;
         gbc_stopTimeValue.insets = new Insets(0, 0, 5, 5);
-        gbc_stopTimeValue.gridx = 2;
+        gbc_stopTimeValue.gridx = 1;
         gbc_stopTimeValue.gridy = 1;
         currentValuesPanel.add(stopTimeValue, gbc_stopTimeValue);
         
@@ -285,8 +307,9 @@ public class Player {
         
         JLabel totalBehaviorTime = new JLabel("0");
         GridBagConstraints gbc_totalBehaviorTime = new GridBagConstraints();
+        gbc_totalBehaviorTime.gridwidth = 3;
         gbc_totalBehaviorTime.insets = new Insets(0, 0, 5, 5);
-        gbc_totalBehaviorTime.gridx = 2;
+        gbc_totalBehaviorTime.gridx = 1;
         gbc_totalBehaviorTime.gridy = 2;
         currentValuesPanel.add(totalBehaviorTime, gbc_totalBehaviorTime);
         
@@ -300,8 +323,9 @@ public class Player {
         
         JLabel label_4 = new JLabel("0");
         GridBagConstraints gbc_label_4 = new GridBagConstraints();
+        gbc_label_4.gridwidth = 3;
         gbc_label_4.insets = new Insets(0, 0, 5, 5);
-        gbc_label_4.gridx = 2;
+        gbc_label_4.gridx = 1;
         gbc_label_4.gridy = 3;
         currentValuesPanel.add(label_4, gbc_label_4);
         
@@ -312,6 +336,14 @@ public class Player {
         gbc_lblValue.gridx = 0;
         gbc_lblValue.gridy = 4;
         currentValuesPanel.add(lblValue, gbc_lblValue);
+        
+        JLabel label_1 = new JLabel("0");
+        GridBagConstraints gbc_label_1 = new GridBagConstraints();
+        gbc_label_1.gridwidth = 3;
+        gbc_label_1.insets = new Insets(0, 0, 0, 5);
+        gbc_label_1.gridx = 1;
+        gbc_label_1.gridy = 4;
+        currentValuesPanel.add(label_1, gbc_label_1);
         
         JPanel panel_1 = new JPanel();
         playerPanel.add(panel_1, BorderLayout.SOUTH);
@@ -336,12 +368,53 @@ public class Player {
         Button button_1 = new Button("2x >>");
         videoControlPanel.add(button_1);
         
-        
-        mediaPlayer.setPlaySubItems(true);
-        
         frame.setLocation(100, 100);
         frame.setSize(720, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-    }
+	}
+	
+	
+	private void playPauseRecord() {
+		if(PlayerState.isPlaying(mediaPlayer)){
+			System.out.println("isPlaying?");
+			startRecording();
+		}else if(PlayerState.isRecording(mediaPlayer)){
+			System.out.println("isRecording?");
+			pausePlaying();
+		}else if(PlayerState.isPaused(mediaPlayer)){
+			System.out.println("isPaused?");
+			resumePlaying();
+		}else{
+			System.out.println("Error State");
+		}
+	}
+	
+	protected static void playSelectedVideoFile(File file){
+		String fn = file.getAbsolutePath();
+		boolean test = mediaPlayer.playMedia(fn);
+		PlayerState.setPlayerState(PlayerState.PLAYING);
+        System.out.println(test+" "+PlayerState.PLAYING);
+	}
+	
+	private void startRecording() {
+		PlayerState.setPlayerState(PlayerState.RECORDING);
+		btnPlaypauserecord.setText("End Record");
+		System.out.println("Re"+mediaPlayer.getTime());
+	}
+
+	private void pausePlaying() {
+		PlayerState.setPlayerState(PlayerState.PAUSED);
+		btnPlaypauserecord.setText("Play");
+		System.out.println("Pa"+mediaPlayer.getTime());
+		mediaPlayer.pause();
+	}
+
+	private void resumePlaying() {
+		PlayerState.setPlayerState(PlayerState.PLAYING);
+		btnPlaypauserecord.setText("Start Record");
+		System.out.println("Pl"+mediaPlayer.getTime());
+		mediaPlayer.play();
+		
+	}
 }
