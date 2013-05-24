@@ -11,15 +11,15 @@ package com.mandar.mousecounter;
  * 
  */
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -51,6 +51,8 @@ public class Player {
 	private MenuClass menuClass;
 	private JFrame mainFrame;
 	private JButton btnPlaypauserecord;
+	private EventsRecorder eventsRecorder = new EventsRecorder();
+	private BehaviorEvent behaviorEvent;
 	
     public static void main(final String[] args) {
         NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
@@ -85,7 +87,7 @@ public class Player {
 				//"--audio-visual=visual",
 		// Create a factory instance (once), you can keep a reference to this
 		//uncomment
-		//mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
+		mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
 		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(frame);
         mediaPlayer = mediaPlayerFactory.newEmbeddedMediaPlayer(fullScreenStrategy);
 		mediaPlayer.setVideoSurface(mediaPlayerFactory.newVideoSurface(canvas));
@@ -345,28 +347,27 @@ public class Player {
         gbc_label_1.gridy = 4;
         currentValuesPanel.add(label_1, gbc_label_1);
         
-        JPanel panel_1 = new JPanel();
-        playerPanel.add(panel_1, BorderLayout.SOUTH);
-        
         JPanel videoControlPanel = new JPanel();
         videoControlPanel.setBorder(BorderFactory.createTitledBorder("Video Controls"));
         frame.getContentPane().add(videoControlPanel, BorderLayout.SOUTH);
-        videoControlPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        videoControlPanel.setLayout(new BorderLayout(0, 0));
         
-        JLabel lblTime = new JLabel("Time");
-        videoControlPanel.add(lblTime);
+        BehaviorPanel behaviorPanel = new BehaviorPanel();
+        
+        videoControlPanel.add(behaviorPanel);
+        behaviorPanel.setLayout(new BorderLayout(0, 0));
         
         JSlider slider = new JSlider();
-        videoControlPanel.add(slider);
+        behaviorPanel.add(slider, BorderLayout.SOUTH);
         
-        Button button = new Button("<< 2x");
-        videoControlPanel.add(button);
-        
-        Button button_2 = new Button("||");
-        videoControlPanel.add(button_2);
-        
-        Button button_1 = new Button("2x >>");
-        videoControlPanel.add(button_1);
+//        Canvas behaviorCanvas = new Canvas();
+//        behaviorPanel.add(behaviorCanvas, BorderLayout.CENTER);
+//        behaviorCanvas.setBackground(Color.LIGHT_GRAY);
+//        behaviorCanvas.setSize(640, 20);
+//        
+//        JSlider videoslider = new JSlider();
+//        videoslider.setValue(0);
+//        behaviorPanel.add(videoslider, BorderLayout.SOUTH);
         
         frame.setLocation(100, 100);
         frame.setSize(720, 600);
@@ -394,19 +395,24 @@ public class Player {
 		String fn = file.getAbsolutePath();
 		boolean test = mediaPlayer.playMedia(fn);
 		PlayerState.setPlayerState(PlayerState.PLAYING);
-        System.out.println(test+" "+PlayerState.PLAYING);
+        System.out.println(test+" "+PlayerState.PLAYING+", Total time: "+mediaPlayer.getLength());
 	}
 	
 	private void startRecording() {
 		PlayerState.setPlayerState(PlayerState.RECORDING);
 		btnPlaypauserecord.setText("End Record");
 		System.out.println("Re"+mediaPlayer.getTime());
+
+		behaviorEvent = new BehaviorEvent();
+		behaviorEvent.setStartTime(mediaPlayer.getTime());
 	}
 
 	private void pausePlaying() {
 		PlayerState.setPlayerState(PlayerState.PAUSED);
 		btnPlaypauserecord.setText("Play");
 		System.out.println("Pa"+mediaPlayer.getTime());
+		behaviorEvent.setEndTime(mediaPlayer.getTime());
+		eventsRecorder.addEvent(behaviorEvent);
 		mediaPlayer.pause();
 	}
 
