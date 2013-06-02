@@ -54,7 +54,7 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
     }
 	
     public Dimension getPreferredSize() {
-        return new Dimension(250,100);
+        return new Dimension(250,80);
     }
 
     public void paintComponent(Graphics g) {

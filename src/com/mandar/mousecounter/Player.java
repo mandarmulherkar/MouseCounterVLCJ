@@ -14,27 +14,33 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -53,6 +59,22 @@ public class Player {
 	private JButton btnPlaypauserecord;
 	private EventsRecorder eventsRecorder = new EventsRecorder();
 	private BehaviorEvent behaviorEvent;
+	protected boolean mousePressedPlaying;
+	private JSlider positionSlider;
+	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	private JLabel timeLabel = new JLabel("  00:00:00  ");
+	private JLabel lblStartTime = new JLabel("Start Time");
+	private JLabel startTimeValue = new JLabel("0");
+	private JLabel lblStopTime = new JLabel("Stop Time");
+	private JLabel stopTimeValue = new JLabel("0");
+	private JLabel lblTotalTime = new JLabel("Total Time");
+	private JLabel totalBehaviorTime = new JLabel("0");
+	private JLabel lblBehavior = new JLabel("Behavior");
+	private JLabel behaviorValue = new JLabel("0");
+	private JLabel lblValue = new JLabel("Value");
+	private JLabel label_1 = new JLabel("0");
+
+	
 	
     public static void main(final String[] args) {
         NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
@@ -72,8 +94,54 @@ public class Player {
     	Canvas canvas = createCanvas(mainFrame, playerPanel);
         createGUI(mainFrame, playerPanel);
         createMediaPlayer(mainFrame, canvas);
+        if(null != mediaPlayer){
+        	executorService.scheduleAtFixedRate(new updateRunnable(mediaPlayer), 0L, 1L, TimeUnit.SECONDS);
+        }
 	}
 
+	private final class updateRunnable implements Runnable {
+		
+		private final MediaPlayer mediaPlayer;
+		
+		private updateRunnable(MediaPlayer mediaPlayer){
+			this.mediaPlayer = mediaPlayer;
+
+		}
+
+		@Override
+		public void run() {
+	
+			final long time = mediaPlayer.getTime();		      
+			SwingUtilities.invokeLater(new Runnable(){
+
+				@Override
+				public void run() {
+					if(mediaPlayer.isPlaying()){
+						updateTime(time);
+						updatePosition();
+					}
+				}
+			});
+		}
+
+	}
+	
+	protected void updatePosition() {
+		final int position = (int)(mediaPlayer.getPosition() * 1000.0f);
+		System.out.println("pos: "+position+" mediaplayer position"+mediaPlayer.getPosition());
+		positionSlider.setValue(position);
+	}
+
+	protected void updateTime(long millis) {
+		String formattedTime = String.format("  %02d:%02d:%02d  ",
+			TimeUnit.MILLISECONDS.toHours(millis),
+			TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), 
+			TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+		);
+		timeLabel.setText(formattedTime);
+		
+	}
+	
 	private void createMediaPlayer(JFrame frame, Canvas canvas) {
 		// Set some options for libvlc
 				String[] libvlcArgs = {"--vout=macosx",
@@ -118,7 +186,7 @@ public class Player {
 		return frame;
 	}
 
-	private void createGUI(JFrame frame, JPanel playerPanel) {
+	private void createGUI(final JFrame frame, JPanel playerPanel) {
 		JPanel panel = new JPanel();
         playerPanel.add(panel, BorderLayout.EAST);
         GridBagLayout gbl_panel = new GridBagLayout();
@@ -145,68 +213,126 @@ public class Player {
         gbl_activityButtonsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         activityButtonsPanel.setLayout(gbl_activityButtonsPanel);
         
-        JButton btnNewButton_1 = new JButton("Lick");
-        btnNewButton_1.setIcon(new ImageIcon(Player.class.getResource("/icons/icecream.png")));
+        JButton lickButton = new JButton("Lick");
+        lickButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.LICK);
+        			behaviorValue.setText(BehaviorEnum.LICK.toString());
+        		}
+        	}
+        });
+        lickButton.setIcon(new ImageIcon(Player.class.getResource("/icons/icecream.png")));
         GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
         gbc_btnNewButton_1.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton_1.gridx = 1;
         gbc_btnNewButton_1.gridy = 0;
-        activityButtonsPanel.add(btnNewButton_1, gbc_btnNewButton_1);
+        activityButtonsPanel.add(lickButton, gbc_btnNewButton_1);
         
-        JButton btnNewButton = new JButton("Flinch");
-        btnNewButton.setIcon(new ImageIcon(Player.class.getResource("/icons/flinch.png")));
+        JButton flinchButton = new JButton("Flinch");
+        flinchButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.FLINCH);
+        			behaviorValue.setText(BehaviorEnum.FLINCH.toString());
+        		}
+        	}
+        });
+        flinchButton.setIcon(new ImageIcon(Player.class.getResource("/icons/flinch.png")));
         GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
         gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewButton.gridx = 2;
         gbc_btnNewButton.gridy = 0;
-        activityButtonsPanel.add(btnNewButton, gbc_btnNewButton);
+        activityButtonsPanel.add(flinchButton, gbc_btnNewButton);
         
-        JButton btnNewButton_2 = new JButton("Scratch");
-        btnNewButton_2.setIcon(new ImageIcon(Player.class.getResource("/icons/scratch.png")));
+        JButton scratchButton = new JButton("Scratch");
+        scratchButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.SCRATCH);
+        			behaviorValue.setText(BehaviorEnum.SCRATCH.toString());
+        			
+        		}
+        	}
+        });
+        scratchButton.setIcon(new ImageIcon(Player.class.getResource("/icons/scratch.png")));
         GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
         gbc_btnNewButton_2.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton_2.gridx = 1;
         gbc_btnNewButton_2.gridy = 1;
-        activityButtonsPanel.add(btnNewButton_2, gbc_btnNewButton_2);
+        activityButtonsPanel.add(scratchButton, gbc_btnNewButton_2);
         
-        JButton btnNewButton_3 = new JButton("Sniff");
-        btnNewButton_3.setIcon(new ImageIcon(Player.class.getResource("/icons/rose.png")));
+        JButton sniffButton = new JButton("Sniff");
+        sniffButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.SNIFF);
+        			behaviorValue.setText(BehaviorEnum.SNIFF.toString());
+        		}
+        	}
+        });
+        sniffButton.setIcon(new ImageIcon(Player.class.getResource("/icons/rose.png")));
         GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
         gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewButton_3.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_3.gridx = 2;
         gbc_btnNewButton_3.gridy = 1;
-        activityButtonsPanel.add(btnNewButton_3, gbc_btnNewButton_3);
+        activityButtonsPanel.add(sniffButton, gbc_btnNewButton_3);
         
-        JButton btnGuard = new JButton("Guard");
-        btnGuard.setIcon(new ImageIcon(Player.class.getResource("/icons/guard.png")));
+        JButton guardButton = new JButton("Guard");
+        guardButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.GUARD);
+        			behaviorValue.setText(BehaviorEnum.GUARD.toString());
+        		}
+        	}
+        });
+        guardButton.setIcon(new ImageIcon(Player.class.getResource("/icons/guard.png")));
         GridBagConstraints gbc_btnGuard = new GridBagConstraints();
         gbc_btnGuard.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnGuard.insets = new Insets(0, 0, 5, 5);
         gbc_btnGuard.gridx = 1;
         gbc_btnGuard.gridy = 2;
-        activityButtonsPanel.add(btnGuard, gbc_btnGuard);
+        activityButtonsPanel.add(guardButton, gbc_btnGuard);
         
-        JButton btnNewButton_4 = new JButton("Lift");
-        btnNewButton_4.setIcon(new ImageIcon(Player.class.getResource("/icons/lift.png")));
+        JButton liftButton = new JButton("Lift");
+        liftButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){	
+        			behaviorEvent.addBehavior(BehaviorEnum.LIFT);
+        			behaviorValue.setText(BehaviorEnum.LIFT.toString());
+        		}
+        		
+        	}
+        });
+        liftButton.setIcon(new ImageIcon(Player.class.getResource("/icons/lift.png")));
         GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
         gbc_btnNewButton_4.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewButton_4.gridx = 2;
         gbc_btnNewButton_4.gridy = 2;
-        activityButtonsPanel.add(btnNewButton_4, gbc_btnNewButton_4);
+        activityButtonsPanel.add(liftButton, gbc_btnNewButton_4);
         
-        JButton btnSomething = new JButton("Wipe");
-        btnSomething.setIcon(new ImageIcon(Player.class.getResource("/icons/wipe.png")));
+        JButton wipeButton = new JButton("Wipe");
+        wipeButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(null != behaviorEvent){
+        			behaviorEvent.addBehavior(BehaviorEnum.WIPE);
+        			behaviorValue.setText(BehaviorEnum.WIPE.toString());
+        		}
+        	}
+        });
+        wipeButton.setIcon(new ImageIcon(Player.class.getResource("/icons/wipe.png")));
         GridBagConstraints gbc_btnSomething = new GridBagConstraints();
         gbc_btnSomething.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnSomething.insets = new Insets(0, 0, 5, 5);
         gbc_btnSomething.gridx = 1;
         gbc_btnSomething.gridy = 3;
-        activityButtonsPanel.add(btnSomething, gbc_btnSomething);
+        activityButtonsPanel.add(wipeButton, gbc_btnSomething);
         
         JSpinner spinner = new JSpinner();
         GridBagConstraints gbc_spinner = new GridBagConstraints();
@@ -220,6 +346,26 @@ public class Player {
         btnNewBehavior.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		
+        		String newBehavior = (String) JOptionPane.showInputDialog(
+        				frame, 
+        				"Add New Behavior: <Behavior>, <Count>\n",
+	                    "New Behavior",
+	                    JOptionPane.PLAIN_MESSAGE,
+	                    null,
+	                    null,
+	                    "NewBehavior,0");
+        		//Read new behavior 
+        		if(null != newBehavior && newBehavior.length() > 3){
+        			String tokens[] = newBehavior.split(",");
+        			System.out.println(tokens[0]+"");
+        			System.out.println(tokens[1]+"");
+        			if(tokens.length > 1 && null != behaviorEvent){
+        				behaviorEvent.addNewBehavior(tokens[0], tokens[1]);
+        				behaviorValue.setText(tokens[0]);
+        			}
+        		}else{
+        			System.out.println("Nothing recorded");
+        		}
         	}
         });
         GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
@@ -267,15 +413,13 @@ public class Player {
         gbl_currentValuesPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         currentValuesPanel.setLayout(gbl_currentValuesPanel);
         
-        JLabel lblNewLabel_1 = new JLabel("Start Time");
-        GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-        gbc_lblNewLabel_1.fill = GridBagConstraints.HORIZONTAL;
-        gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
-        gbc_lblNewLabel_1.gridx = 0;
-        gbc_lblNewLabel_1.gridy = 0;
-        currentValuesPanel.add(lblNewLabel_1, gbc_lblNewLabel_1);
-        
-        JLabel startTimeValue = new JLabel("0");
+        GridBagConstraints gbc_lblStartTime = new GridBagConstraints();
+        gbc_lblStartTime.fill = GridBagConstraints.HORIZONTAL;
+        gbc_lblStartTime.insets = new Insets(0, 0, 5, 5);
+        gbc_lblStartTime.gridx = 0;
+        gbc_lblStartTime.gridy = 0;
+        currentValuesPanel.add(lblStartTime, gbc_lblStartTime);
+
         GridBagConstraints gbc_startTimeValue = new GridBagConstraints();
         gbc_startTimeValue.gridwidth = 3;
         gbc_startTimeValue.insets = new Insets(0, 0, 5, 5);
@@ -283,15 +427,13 @@ public class Player {
         gbc_startTimeValue.gridy = 0;
         currentValuesPanel.add(startTimeValue, gbc_startTimeValue);
         
-        JLabel lblNewLabel_2 = new JLabel("Stop Time");
-        GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-        gbc_lblNewLabel_2.fill = GridBagConstraints.HORIZONTAL;
-        gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-        gbc_lblNewLabel_2.gridx = 0;
-        gbc_lblNewLabel_2.gridy = 1;
-        currentValuesPanel.add(lblNewLabel_2, gbc_lblNewLabel_2);
-        
-        JLabel stopTimeValue = new JLabel("0");
+        GridBagConstraints gbc_lblStopTime = new GridBagConstraints();
+        gbc_lblStopTime.fill = GridBagConstraints.HORIZONTAL;
+        gbc_lblStopTime.insets = new Insets(0, 0, 5, 5);
+        gbc_lblStopTime.gridx = 0;
+        gbc_lblStopTime.gridy = 1;
+        currentValuesPanel.add(lblStopTime, gbc_lblStopTime);
+
         GridBagConstraints gbc_stopTimeValue = new GridBagConstraints();
         gbc_stopTimeValue.gridwidth = 3;
         gbc_stopTimeValue.insets = new Insets(0, 0, 5, 5);
@@ -299,7 +441,6 @@ public class Player {
         gbc_stopTimeValue.gridy = 1;
         currentValuesPanel.add(stopTimeValue, gbc_stopTimeValue);
         
-        JLabel lblTotalTime = new JLabel("Total Time");
         GridBagConstraints gbc_lblTotalTime = new GridBagConstraints();
         gbc_lblTotalTime.fill = GridBagConstraints.HORIZONTAL;
         gbc_lblTotalTime.insets = new Insets(0, 0, 5, 5);
@@ -307,7 +448,6 @@ public class Player {
         gbc_lblTotalTime.gridy = 2;
         currentValuesPanel.add(lblTotalTime, gbc_lblTotalTime);
         
-        JLabel totalBehaviorTime = new JLabel("0");
         GridBagConstraints gbc_totalBehaviorTime = new GridBagConstraints();
         gbc_totalBehaviorTime.gridwidth = 3;
         gbc_totalBehaviorTime.insets = new Insets(0, 0, 5, 5);
@@ -315,7 +455,6 @@ public class Player {
         gbc_totalBehaviorTime.gridy = 2;
         currentValuesPanel.add(totalBehaviorTime, gbc_totalBehaviorTime);
         
-        JLabel lblBehavior = new JLabel("Behavior");
         GridBagConstraints gbc_lblBehavior = new GridBagConstraints();
         gbc_lblBehavior.fill = GridBagConstraints.HORIZONTAL;
         gbc_lblBehavior.insets = new Insets(0, 0, 5, 5);
@@ -323,15 +462,13 @@ public class Player {
         gbc_lblBehavior.gridy = 3;
         currentValuesPanel.add(lblBehavior, gbc_lblBehavior);
         
-        JLabel label_4 = new JLabel("0");
-        GridBagConstraints gbc_label_4 = new GridBagConstraints();
-        gbc_label_4.gridwidth = 3;
-        gbc_label_4.insets = new Insets(0, 0, 5, 5);
-        gbc_label_4.gridx = 1;
-        gbc_label_4.gridy = 3;
-        currentValuesPanel.add(label_4, gbc_label_4);
+        GridBagConstraints gbc_behaviorValue = new GridBagConstraints();
+        gbc_behaviorValue.gridwidth = 3;
+        gbc_behaviorValue.insets = new Insets(0, 0, 5, 5);
+        gbc_behaviorValue.gridx = 1;
+        gbc_behaviorValue.gridy = 3;
+        currentValuesPanel.add(behaviorValue, gbc_behaviorValue);
         
-        JLabel lblValue = new JLabel("Value");
         GridBagConstraints gbc_lblValue = new GridBagConstraints();
         gbc_lblValue.fill = GridBagConstraints.HORIZONTAL;
         gbc_lblValue.insets = new Insets(0, 0, 0, 5);
@@ -339,7 +476,6 @@ public class Player {
         gbc_lblValue.gridy = 4;
         currentValuesPanel.add(lblValue, gbc_lblValue);
         
-        JLabel label_1 = new JLabel("0");
         GridBagConstraints gbc_label_1 = new GridBagConstraints();
         gbc_label_1.gridwidth = 3;
         gbc_label_1.insets = new Insets(0, 0, 0, 5);
@@ -357,8 +493,32 @@ public class Player {
         videoControlPanel.add(behaviorPanel);
         behaviorPanel.setLayout(new BorderLayout(0, 0));
         
-        JSlider slider = new JSlider();
-        behaviorPanel.add(slider, BorderLayout.SOUTH);
+        positionSlider = new JSlider();
+        positionSlider.setMaximum(100000);
+        positionSlider.setValue(0);
+        behaviorPanel.add(positionSlider);
+        timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        behaviorPanel.add(timeLabel, BorderLayout.WEST);
+        positionSlider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+              if(mediaPlayer.isPlaying()) {
+                mousePressedPlaying = true;
+                mediaPlayer.pause();
+              }
+              else {
+                mousePressedPlaying = false;
+              }
+              setSliderBasedPosition();
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+              setSliderBasedPosition();
+              updateUIState();
+            }
+          });
         
 //        Canvas behaviorCanvas = new Canvas();
 //        behaviorPanel.add(behaviorCanvas, BorderLayout.CENTER);
@@ -376,6 +536,47 @@ public class Player {
 	}
 	
 	
+	protected void updateUIState() {
+		if(!mediaPlayer.isPlaying()){
+			mediaPlayer.play();
+			
+			if(!mousePressedPlaying) {
+                try {
+                        // Half a second probably gets an iframe
+                        Thread.sleep(500);  
+                } 
+                catch(InterruptedException e) {
+                        // Don't care if unblocked early
+                }
+                mediaPlayer.pause();
+        }
+    }                       
+		long time = mediaPlayer.getTime();
+		int chapter = mediaPlayer.getChapter();
+		int chapterCount = mediaPlayer.getChapterCount();
+		System.out.println("chapter "+chapter +" "+chapterCount);
+		updateTime(time);
+		updatePosition();
+			
+	}
+
+	protected void setSliderBasedPosition() {
+		if(!mediaPlayer.isSeekable()){
+			return;
+		}else {
+			float positionValue = (float)positionSlider.getValue() / 1000.0f;
+			
+			// Avoid eof freeze up
+			if(positionValue > 0.99f) {
+				positionValue = 0.99f;
+			}
+			
+			mediaPlayer.setPosition(positionValue);
+			
+		}
+		
+	}
+
 	private void playPauseRecord() {
 		if(PlayerState.isPlaying(mediaPlayer)){
 			System.out.println("isPlaying?");
@@ -405,14 +606,18 @@ public class Player {
 
 		behaviorEvent = new BehaviorEvent();
 		behaviorEvent.setStartTime(mediaPlayer.getTime());
+		startTimeValue.setText(mediaPlayer.getTime()+"");
 	}
 
 	private void pausePlaying() {
 		PlayerState.setPlayerState(PlayerState.PAUSED);
 		btnPlaypauserecord.setText("Play");
 		System.out.println("Pa"+mediaPlayer.getTime());
-		behaviorEvent.setEndTime(mediaPlayer.getTime());
-		eventsRecorder.addEvent(behaviorEvent);
+		if(null != behaviorEvent){
+			behaviorEvent.setEndTime(mediaPlayer.getTime());
+			stopTimeValue.setText(mediaPlayer.getTime()+"");
+		}
+		
 		mediaPlayer.pause();
 	}
 
@@ -420,6 +625,7 @@ public class Player {
 		PlayerState.setPlayerState(PlayerState.PLAYING);
 		btnPlaypauserecord.setText("Start Record");
 		System.out.println("Pl"+mediaPlayer.getTime());
+		eventsRecorder.addEvent(behaviorEvent);
 		mediaPlayer.play();
 		
 	}
