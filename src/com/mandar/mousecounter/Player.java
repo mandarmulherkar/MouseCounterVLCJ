@@ -169,7 +169,7 @@ public class Player {
 				//"--audio-visual=visual",
 		// Create a factory instance (once), you can keep a reference to this
 		//uncomment
-		mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
+		//mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
 		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(frame);
         mediaPlayer = mediaPlayerFactory.newEmbeddedMediaPlayer(fullScreenStrategy);
 		mediaPlayer.setVideoSurface(mediaPlayerFactory.newVideoSurface(canvas));
