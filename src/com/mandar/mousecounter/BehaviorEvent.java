@@ -4,6 +4,7 @@ public class BehaviorEvent {
 
 	private long startTime;
 	private long endTime;
+	private long totalTime;
 	private BehaviorEnum behavior;
 	private int behaviorCount;
 	private String newBehavior;
@@ -36,6 +37,19 @@ public class BehaviorEvent {
 		this.newBehavior = newBehavior;
 		this.newBehaviorFlag = true;
 		
+	}
+
+	public void setTotalCount(int value) {
+		this.behaviorCount = value;
+		
+	}
+
+	public void setDifference() {
+		this.totalTime = endTime - startTime;
+	}
+
+	public long getTotalTime() {
+		return totalTime;
 	}
 	
 }

@@ -25,8 +25,11 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +46,8 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -66,19 +71,23 @@ public class Player {
 	private BehaviorEvent behaviorEvent;
 	protected boolean mousePressedPlaying;
 	private JSlider positionSlider;
+	private String currentlyPlayingFile;
+	private float videoPlayingRate = 1.0f;
 	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	
 	private JLabel timeLabel = new JLabel("  00:00:00  ");
 	private JLabel lblStartTime = new JLabel("Start Time");
-	private JLabel startTimeValue = new JLabel("0");
+	private JLabel startTimeValue = new JLabel("");
 	private JLabel lblStopTime = new JLabel("Stop Time");
-	private JLabel stopTimeValue = new JLabel("0");
+	private JLabel stopTimeValue = new JLabel("");
 	private JLabel lblTotalTime = new JLabel("Total Time");
-	private JLabel totalBehaviorTime = new JLabel("0");
+	private JLabel totalBehaviorTime = new JLabel("");
 	private JLabel lblBehavior = new JLabel("Behavior");
-	private JLabel behaviorValue = new JLabel("0");
+	private JLabel behaviorValue = new JLabel("");
 	private JLabel lblValue = new JLabel("Value");
-	private JLabel label_1 = new JLabel("0");
+	private JLabel numberOfTimes = new JLabel("");
 
+	private JSpinner spinner = new JSpinner();
 	
 	
     public static void main(final String[] args) {
@@ -212,10 +221,10 @@ public class Player {
         gbc_panel_2.gridy = 1;
         panel.add(activityButtonsPanel, gbc_panel_2);
         GridBagLayout gbl_activityButtonsPanel = new GridBagLayout();
-        gbl_activityButtonsPanel.columnWidths = new int[]{0, 0, 0, 0};
-        gbl_activityButtonsPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_activityButtonsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_activityButtonsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_activityButtonsPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
+        gbl_activityButtonsPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        gbl_activityButtonsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_activityButtonsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         activityButtonsPanel.setLayout(gbl_activityButtonsPanel);
         
         JButton lickButton = new JButton("Lick");
@@ -247,7 +256,7 @@ public class Player {
         flinchButton.setIcon(new ImageIcon(Player.class.getResource("/icons/flinch.png")));
         GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
         gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
-        gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
+        gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton.gridx = 2;
         gbc_btnNewButton.gridy = 0;
         activityButtonsPanel.add(flinchButton, gbc_btnNewButton);
@@ -281,7 +290,7 @@ public class Player {
         });
         sniffButton.setIcon(new ImageIcon(Player.class.getResource("/icons/rose.png")));
         GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
-        gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 0);
+        gbc_btnNewButton_3.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton_3.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewButton_3.gridx = 2;
         gbc_btnNewButton_3.gridy = 1;
@@ -317,7 +326,7 @@ public class Player {
         liftButton.setIcon(new ImageIcon(Player.class.getResource("/icons/lift.png")));
         GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
         gbc_btnNewButton_4.fill = GridBagConstraints.HORIZONTAL;
-        gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 0);
+        gbc_btnNewButton_4.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton_4.gridx = 2;
         gbc_btnNewButton_4.gridy = 2;
         activityButtonsPanel.add(liftButton, gbc_btnNewButton_4);
@@ -339,14 +348,6 @@ public class Player {
         gbc_btnSomething.gridy = 3;
         activityButtonsPanel.add(wipeButton, gbc_btnSomething);
         
-        btnPlaypauserecord = new JButton("Play");
-        btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/play.png")));
-        btnPlaypauserecord.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		playPauseRecord();
-        	}
-        });
-        
         JButton btnNewBehavior = new JButton("New");
         btnNewBehavior.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
@@ -363,35 +364,144 @@ public class Player {
         				behaviorEvent.addNewBehavior(newBehavior);
         				behaviorValue.setText(newBehavior);
         		}else{
-        			behaviorEvent.addNewBehavior("NoName");
-    				behaviorValue.setText("NoName");
+        			if(behaviorEvent != null){
+        				behaviorEvent.addNewBehavior("NoName");
+    					behaviorValue.setText("NoName");
+        			}
         		}
         	}
         });
         btnNewBehavior.setIcon(new ImageIcon(Player.class.getResource("/icons/new.png")));
         GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
         gbc_btnNewBehavior.insets = new Insets(0, 0, 5, 0);
-        gbc_btnNewBehavior.gridwidth = 2;
+        gbc_btnNewBehavior.gridwidth = 3;
         gbc_btnNewBehavior.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewBehavior.gridx = 2;
         gbc_btnNewBehavior.gridy = 3;
         activityButtonsPanel.add(btnNewBehavior, gbc_btnNewBehavior);
         
-        JSpinner spinner = new JSpinner();
+        JLabel lblCount = new JLabel("Count");
+        GridBagConstraints gbc_lblCount = new GridBagConstraints();
+        gbc_lblCount.insets = new Insets(0, 0, 5, 5);
+        gbc_lblCount.gridx = 1;
+        gbc_lblCount.gridy = 4;
+        activityButtonsPanel.add(lblCount, gbc_lblCount);
+        
         GridBagConstraints gbc_spinner = new GridBagConstraints();
-        gbc_spinner.gridwidth = 2;
         gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
-        gbc_spinner.insets = new Insets(0, 0, 5, 0);
-        gbc_spinner.gridx = 1;
-        gbc_spinner.gridy = 5;
+        gbc_spinner.insets = new Insets(0, 0, 5, 5);
+        gbc_spinner.gridx = 2;
+        gbc_spinner.gridy = 4;
         activityButtonsPanel.add(spinner, gbc_spinner);
         
+        spinner.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				numberOfTimes.setText(spinner.getValue()+"");
+				if(behaviorEvent != null){
+					behaviorEvent.setTotalCount(Integer.parseInt(spinner.getValue()+""));
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				numberOfTimes.setText(spinner.getValue()+"");
+				if(behaviorEvent != null){
+					behaviorEvent.setTotalCount(Integer.parseInt(spinner.getValue()+""));
+				}
+			}
+        	
+        });
+        
+        spinner.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				System.out.println("click");
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				System.out.println("enter");
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				System.out.println("exit");
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				System.out.println("press");
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+        
+        spinner.addChangeListener(new ChangeListener(){
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				numberOfTimes.setText(spinner.getValue()+"");
+				if(behaviorEvent != null){
+					behaviorEvent.setTotalCount(Integer.parseInt(spinner.getValue()+""));
+				}
+			}
+        });
+        
+        btnPlaypauserecord = new JButton("Play");
+        btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/play.png")));
+        btnPlaypauserecord.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		playPauseRecord();
+        	}
+        });
+        
         GridBagConstraints gbc_btnPlaypauserecord = new GridBagConstraints();
+        gbc_btnPlaypauserecord.insets = new Insets(0, 0, 5, 5);
         gbc_btnPlaypauserecord.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnPlaypauserecord.gridwidth = 2;
         gbc_btnPlaypauserecord.gridx = 1;
-        gbc_btnPlaypauserecord.gridy = 6;
+        gbc_btnPlaypauserecord.gridy = 5;
         activityButtonsPanel.add(btnPlaypauserecord, gbc_btnPlaypauserecord);
+        
+        JButton button = new JButton("<<");
+        button.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		// slow it down!
+        		videoPlayingRate /= 2;
+        		mediaPlayer.setRate((float) videoPlayingRate);
+        	}
+        });
+        
+        GridBagConstraints gbc_button = new GridBagConstraints();
+        gbc_button.insets = new Insets(0, 0, 5, 5);
+        gbc_button.gridx = 1;
+        gbc_button.gridy = 6;
+        activityButtonsPanel.add(button, gbc_button);
+        
+        JButton btnNewButton = new JButton(">>");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		// speed it up!
+        		videoPlayingRate *= 2;
+        		mediaPlayer.setRate((float) videoPlayingRate);
+        	}
+        });
+        GridBagConstraints gbc_btnNewButton1 = new GridBagConstraints();
+        gbc_btnNewButton1.insets = new Insets(0, 0, 5, 5);
+        gbc_btnNewButton1.gridx = 2;
+        gbc_btnNewButton1.gridy = 6;
+        activityButtonsPanel.add(btnNewButton, gbc_btnNewButton1);
         
         JLabel label = new JLabel("");
         GridBagConstraints gbc_label = new GridBagConstraints();
@@ -424,6 +534,7 @@ public class Player {
         currentValuesPanel.add(lblStartTime, gbc_lblStartTime);
 
         GridBagConstraints gbc_startTimeValue = new GridBagConstraints();
+        gbc_startTimeValue.anchor = GridBagConstraints.WEST;
         gbc_startTimeValue.gridwidth = 3;
         gbc_startTimeValue.insets = new Insets(0, 0, 5, 5);
         gbc_startTimeValue.gridx = 1;
@@ -438,6 +549,7 @@ public class Player {
         currentValuesPanel.add(lblStopTime, gbc_lblStopTime);
 
         GridBagConstraints gbc_stopTimeValue = new GridBagConstraints();
+        gbc_stopTimeValue.anchor = GridBagConstraints.WEST;
         gbc_stopTimeValue.gridwidth = 3;
         gbc_stopTimeValue.insets = new Insets(0, 0, 5, 5);
         gbc_stopTimeValue.gridx = 1;
@@ -452,6 +564,7 @@ public class Player {
         currentValuesPanel.add(lblTotalTime, gbc_lblTotalTime);
         
         GridBagConstraints gbc_totalBehaviorTime = new GridBagConstraints();
+        gbc_totalBehaviorTime.anchor = GridBagConstraints.WEST;
         gbc_totalBehaviorTime.gridwidth = 3;
         gbc_totalBehaviorTime.insets = new Insets(0, 0, 5, 5);
         gbc_totalBehaviorTime.gridx = 1;
@@ -466,6 +579,7 @@ public class Player {
         currentValuesPanel.add(lblBehavior, gbc_lblBehavior);
         
         GridBagConstraints gbc_behaviorValue = new GridBagConstraints();
+        gbc_behaviorValue.anchor = GridBagConstraints.WEST;
         gbc_behaviorValue.gridwidth = 3;
         gbc_behaviorValue.insets = new Insets(0, 0, 5, 5);
         gbc_behaviorValue.gridx = 1;
@@ -479,12 +593,13 @@ public class Player {
         gbc_lblValue.gridy = 4;
         currentValuesPanel.add(lblValue, gbc_lblValue);
         
-        GridBagConstraints gbc_label_1 = new GridBagConstraints();
-        gbc_label_1.gridwidth = 3;
-        gbc_label_1.insets = new Insets(0, 0, 0, 5);
-        gbc_label_1.gridx = 1;
-        gbc_label_1.gridy = 4;
-        currentValuesPanel.add(label_1, gbc_label_1);
+        GridBagConstraints gbc_numberOfTimes = new GridBagConstraints();
+        gbc_numberOfTimes.anchor = GridBagConstraints.WEST;
+        gbc_numberOfTimes.gridwidth = 3;
+        gbc_numberOfTimes.insets = new Insets(0, 0, 0, 5);
+        gbc_numberOfTimes.gridx = 1;
+        gbc_numberOfTimes.gridy = 4;
+        currentValuesPanel.add(numberOfTimes, gbc_numberOfTimes);
         
         JPanel videoControlPanel = new JPanel();
         videoControlPanel.setBorder(BorderFactory.createTitledBorder("Video Controls"));
@@ -533,7 +648,7 @@ public class Player {
 //        behaviorPanel.add(videoslider, BorderLayout.SOUTH);
         
         frame.setLocation(100, 100);
-        frame.setSize(720, 600);
+        frame.setSize(720, 650);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 	}
@@ -573,14 +688,15 @@ public class Player {
 			if(positionValue > 0.99f) {
 				positionValue = 0.99f;
 			}
-			
 			mediaPlayer.setPosition(positionValue);
-			
 		}
 		
 	}
 
 	private void playPauseRecord() {
+		
+		mediaPlayer.setRate((float) 1.0f);
+		
 		if(PlayerState.isPlaying(mediaPlayer)){
 			System.out.println("isPlaying?");
 			startRecording();
@@ -596,9 +712,10 @@ public class Player {
 	}
 	
 	public void playSelectedVideoFile(File file){
-		String fn = file.getAbsolutePath();
-		mediaPlayer.playMedia(fn);
-		pausePlaying();
+		currentlyPlayingFile = file.getAbsolutePath();
+		System.out.println("Playing");
+		mediaPlayer.prepareMedia(currentlyPlayingFile, new String[] {});
+		PlayerState.setPlayerState(PlayerState.PAUSED);
 	}
 	
 	private void startRecording() {
@@ -613,6 +730,8 @@ public class Player {
 	}
 
 	private void pausePlaying() {
+		System.out.println("Pausing the Player");
+		mediaPlayer.pause();
 		PlayerState.setPlayerState(PlayerState.PAUSED);
 		btnPlaypauserecord.setText("Play");
 		btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/play.png")));
@@ -620,18 +739,29 @@ public class Player {
 		if(null != behaviorEvent){
 			behaviorEvent.setEndTime(mediaPlayer.getTime());
 			stopTimeValue.setText(mediaPlayer.getTime()+"");
+			behaviorEvent.setDifference();
+			totalBehaviorTime.setText(behaviorEvent.getTotalTime()+"");
 		}
-		
-		mediaPlayer.pause();
 	}
 
 	private void resumePlaying() {
 		PlayerState.setPlayerState(PlayerState.PLAYING);
+		resetLabels();
 		btnPlaypauserecord.setText("Start Record");
 		btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/record.png")));
 		System.out.println("Pl"+mediaPlayer.getTime());
 		eventsRecorder.addEvent(behaviorEvent);
 		mediaPlayer.play();
+	}
+
+	private void resetLabels() {
+		
+		startTimeValue.setText("");
+		stopTimeValue.setText("");
+		totalBehaviorTime.setText("");
+		behaviorValue.setText("");
+		numberOfTimes.setText("");
+		spinner.setValue(0);
 		
 	}
 }

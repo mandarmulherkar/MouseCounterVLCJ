@@ -15,12 +15,12 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 public class MenuClass {
 
 	private static JFrame frame;
-	private static Player mediaPlayer;
+	private static Player player;
 	private File currentFilename;
 	
 	public MenuClass(JFrame frame, Player player){
 		this.frame = frame;
-		this.mediaPlayer = player;
+		this.player = player;
 	}
 
 
@@ -48,7 +48,7 @@ public class MenuClass {
 		if(retVal == JFileChooser.APPROVE_OPTION){
 			currentFilename = fileChooser.getSelectedFile();
 			System.out.println(""+currentFilename.getAbsolutePath());
-			mediaPlayer.playSelectedVideoFile(currentFilename);
+			player.playSelectedVideoFile(currentFilename);
 		}else{
 			System.out.println("File open cancelled.");
 		}
