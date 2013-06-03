@@ -715,6 +715,14 @@ public class Player {
 		currentlyPlayingFile = file.getAbsolutePath();
 		System.out.println("Playing");
 		mediaPlayer.prepareMedia(currentlyPlayingFile, new String[] {});
+		mediaPlayer.play();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mediaPlayer.pause();
 		PlayerState.setPlayerState(PlayerState.PAUSED);
 	}
 	
