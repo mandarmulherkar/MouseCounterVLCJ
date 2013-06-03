@@ -11,7 +11,9 @@ public class EventsRecorder {
 		
 		eventList.add(behaviorEvent);
 		for(BehaviorEvent event : eventList){
-			System.out.print(" ("+event.toString()+") ");
+			if(event != null){
+				System.out.print(" ("+event.toString()+") ");
+			}
 		}
 		
 		

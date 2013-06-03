@@ -31,13 +31,9 @@ public class BehaviorEvent {
 		
 	}
 
-	public void addNewBehavior(String newBehavior, String newBehaviorCount) {
-		
+	public void addNewBehavior(String newBehavior) {
 		System.out.println(newBehavior);
-		System.out.println(newBehaviorCount);
-		
 		this.newBehavior = newBehavior;
-		this.newBehaviorCount = newBehaviorCount;
 		this.newBehaviorFlag = true;
 		
 	}

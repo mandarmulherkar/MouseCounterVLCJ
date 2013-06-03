@@ -9,6 +9,11 @@ package com.mandar.mousecounter;
  * Interesting audio visualization
  * https://github.com/caprica/vlcj/blob/master/src/test/java/uk/co/caprica/vlcj/test/visualisation/VisualisationPlayer.java
  * 
+ * Sample code
+ * https://code.google.com/p/vlcj/wiki/SimpleExamples
+ * https://code.google.com/p/vlcj/source/browse/trunk/vlcj/src/test/java/uk/co/caprica/vlcj/test/basic/PlayerControlsPanel.java
+ * 
+ * 
  */
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -180,7 +185,7 @@ public class Player {
     	frame.getContentPane().setFont(new Font("Helvetica", Font.PLAIN, 13));
     	frame.setFont(new Font("Helvetica", Font.PLAIN, 12));
     	
-    	menuClass = new MenuClass(frame, mediaPlayer);
+    	menuClass = new MenuClass(frame, this);
     	menuClass.buildMenu();
     	
 		return frame;
@@ -200,17 +205,17 @@ public class Player {
         activityButtonsPanel.setBorder(BorderFactory.createTitledBorder("Behavior"));
         GridBagConstraints gbc_panel_2 = new GridBagConstraints();
         gbc_panel_2.gridheight = 7;
-        gbc_panel_2.gridwidth = 3;
+        gbc_panel_2.gridwidth = 2;
         gbc_panel_2.insets = new Insets(0, 0, 5, 0);
         gbc_panel_2.fill = GridBagConstraints.BOTH;
-        gbc_panel_2.gridx = 0;
+        gbc_panel_2.gridx = 1;
         gbc_panel_2.gridy = 1;
         panel.add(activityButtonsPanel, gbc_panel_2);
         GridBagLayout gbl_activityButtonsPanel = new GridBagLayout();
         gbl_activityButtonsPanel.columnWidths = new int[]{0, 0, 0, 0};
-        gbl_activityButtonsPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+        gbl_activityButtonsPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
         gbl_activityButtonsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_activityButtonsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_activityButtonsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         activityButtonsPanel.setLayout(gbl_activityButtonsPanel);
         
         JButton lickButton = new JButton("Lick");
@@ -334,60 +339,58 @@ public class Player {
         gbc_btnSomething.gridy = 3;
         activityButtonsPanel.add(wipeButton, gbc_btnSomething);
         
-        JSpinner spinner = new JSpinner();
-        GridBagConstraints gbc_spinner = new GridBagConstraints();
-        gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
-        gbc_spinner.insets = new Insets(0, 0, 5, 0);
-        gbc_spinner.gridx = 2;
-        gbc_spinner.gridy = 3;
-        activityButtonsPanel.add(spinner, gbc_spinner);
-        
-        JButton btnNewBehavior = new JButton("New Behavior");
-        btnNewBehavior.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		
-        		String newBehavior = (String) JOptionPane.showInputDialog(
-        				frame, 
-        				"Add New Behavior: <Behavior>, <Count>\n",
-	                    "New Behavior",
-	                    JOptionPane.PLAIN_MESSAGE,
-	                    null,
-	                    null,
-	                    "NewBehavior,0");
-        		//Read new behavior 
-        		if(null != newBehavior && newBehavior.length() > 3){
-        			String tokens[] = newBehavior.split(",");
-        			System.out.println(tokens[0]+"");
-        			System.out.println(tokens[1]+"");
-        			if(tokens.length > 1 && null != behaviorEvent){
-        				behaviorEvent.addNewBehavior(tokens[0], tokens[1]);
-        				behaviorValue.setText(tokens[0]);
-        			}
-        		}else{
-        			System.out.println("Nothing recorded");
-        		}
-        	}
-        });
-        GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
-        gbc_btnNewBehavior.insets = new Insets(0, 0, 5, 0);
-        gbc_btnNewBehavior.gridwidth = 2;
-        gbc_btnNewBehavior.fill = GridBagConstraints.HORIZONTAL;
-        gbc_btnNewBehavior.gridx = 1;
-        gbc_btnNewBehavior.gridy = 4;
-        activityButtonsPanel.add(btnNewBehavior, gbc_btnNewBehavior);
-        
-        btnPlaypauserecord = new JButton("Start Record");
+        btnPlaypauserecord = new JButton("Play");
+        btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/play.png")));
         btnPlaypauserecord.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		playPauseRecord();
         	}
         });
         
+        JButton btnNewBehavior = new JButton("New");
+        btnNewBehavior.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		String newBehavior = (String) JOptionPane.showInputDialog(
+        				frame, 
+        				"Add New Behavior:\n",
+	                    "New Behavior",
+	                    JOptionPane.PLAIN_MESSAGE,
+	                    null,
+	                    null,
+	                    "NewBehavior");
+        		//Read new behavior 
+        		if(null != newBehavior){
+        				behaviorEvent.addNewBehavior(newBehavior);
+        				behaviorValue.setText(newBehavior);
+        		}else{
+        			behaviorEvent.addNewBehavior("NoName");
+    				behaviorValue.setText("NoName");
+        		}
+        	}
+        });
+        btnNewBehavior.setIcon(new ImageIcon(Player.class.getResource("/icons/new.png")));
+        GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
+        gbc_btnNewBehavior.insets = new Insets(0, 0, 5, 0);
+        gbc_btnNewBehavior.gridwidth = 2;
+        gbc_btnNewBehavior.fill = GridBagConstraints.HORIZONTAL;
+        gbc_btnNewBehavior.gridx = 2;
+        gbc_btnNewBehavior.gridy = 3;
+        activityButtonsPanel.add(btnNewBehavior, gbc_btnNewBehavior);
+        
+        JSpinner spinner = new JSpinner();
+        GridBagConstraints gbc_spinner = new GridBagConstraints();
+        gbc_spinner.gridwidth = 2;
+        gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
+        gbc_spinner.insets = new Insets(0, 0, 5, 0);
+        gbc_spinner.gridx = 1;
+        gbc_spinner.gridy = 5;
+        activityButtonsPanel.add(spinner, gbc_spinner);
+        
         GridBagConstraints gbc_btnPlaypauserecord = new GridBagConstraints();
         gbc_btnPlaypauserecord.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnPlaypauserecord.gridwidth = 2;
         gbc_btnPlaypauserecord.gridx = 1;
-        gbc_btnPlaypauserecord.gridy = 5;
+        gbc_btnPlaypauserecord.gridy = 6;
         activityButtonsPanel.add(btnPlaypauserecord, gbc_btnPlaypauserecord);
         
         JLabel label = new JLabel("");
@@ -494,7 +497,7 @@ public class Player {
         behaviorPanel.setLayout(new BorderLayout(0, 0));
         
         positionSlider = new JSlider();
-        positionSlider.setMaximum(100000);
+        positionSlider.setMaximum(1000);
         positionSlider.setValue(0);
         behaviorPanel.add(positionSlider);
         timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -592,16 +595,16 @@ public class Player {
 		}
 	}
 	
-	protected static void playSelectedVideoFile(File file){
+	public void playSelectedVideoFile(File file){
 		String fn = file.getAbsolutePath();
-		boolean test = mediaPlayer.playMedia(fn);
-		PlayerState.setPlayerState(PlayerState.PLAYING);
-        System.out.println(test+" "+PlayerState.PLAYING+", Total time: "+mediaPlayer.getLength());
+		mediaPlayer.playMedia(fn);
+		pausePlaying();
 	}
 	
 	private void startRecording() {
 		PlayerState.setPlayerState(PlayerState.RECORDING);
 		btnPlaypauserecord.setText("End Record");
+		btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/pause.png")));
 		System.out.println("Re"+mediaPlayer.getTime());
 
 		behaviorEvent = new BehaviorEvent();
@@ -612,6 +615,7 @@ public class Player {
 	private void pausePlaying() {
 		PlayerState.setPlayerState(PlayerState.PAUSED);
 		btnPlaypauserecord.setText("Play");
+		btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/play.png")));
 		System.out.println("Pa"+mediaPlayer.getTime());
 		if(null != behaviorEvent){
 			behaviorEvent.setEndTime(mediaPlayer.getTime());
@@ -624,6 +628,7 @@ public class Player {
 	private void resumePlaying() {
 		PlayerState.setPlayerState(PlayerState.PLAYING);
 		btnPlaypauserecord.setText("Start Record");
+		btnPlaypauserecord.setIcon(new ImageIcon(Player.class.getResource("/icons/record.png")));
 		System.out.println("Pl"+mediaPlayer.getTime());
 		eventsRecorder.addEvent(behaviorEvent);
 		mediaPlayer.play();

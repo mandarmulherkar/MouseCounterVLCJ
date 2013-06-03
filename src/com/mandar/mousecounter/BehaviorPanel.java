@@ -17,10 +17,10 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int squareX = 50;
-    private int squareY = 50;
-    private int squareW = 20;
-    private int squareH = 20;
+	private int squareX = 10;
+    private int squareY = 10;
+    private int squareW = 30;
+    private int squareH = 30;
 
     private Dimension dimension;
     
@@ -39,7 +39,6 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
                 System.out.println(""+e.getX()+", "+e.getY());
             }
         });
-        
         addComponentListener(this);
 	}
 
