@@ -474,7 +474,7 @@ public class Player {
         gbc_btnPlaypauserecord.gridy = 5;
         activityButtonsPanel.add(btnPlaypauserecord, gbc_btnPlaypauserecord);
         
-        JButton button = new JButton("<<");
+        JButton button = new JButton("<< slower");
         button.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		// slow it down!
@@ -489,7 +489,7 @@ public class Player {
         gbc_button.gridy = 6;
         activityButtonsPanel.add(button, gbc_button);
         
-        JButton btnNewButton = new JButton(">>");
+        JButton btnNewButton = new JButton("faster >>");
         btnNewButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		// speed it up!
@@ -694,9 +694,6 @@ public class Player {
 	}
 
 	private void playPauseRecord() {
-		
-		mediaPlayer.setRate((float) 1.0f);
-		
 		if(PlayerState.isPlaying(mediaPlayer)){
 			System.out.println("isPlaying?");
 			startRecording();
