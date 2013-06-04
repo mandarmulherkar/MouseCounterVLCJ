@@ -71,7 +71,8 @@ public class Player {
 	private BehaviorEvent behaviorEvent;
 	protected boolean mousePressedPlaying;
 	private JSlider positionSlider;
-	private String currentlyPlayingFile;
+	private String currentlyPlaying;
+	private static File currentlyPlayingVideoFile = null;
 	private float videoPlayingRate = 1.0f;
 	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 	
@@ -113,13 +114,14 @@ public class Player {
         }
 	}
 
+	public static File getCurrentlyPlayingVideoFile(){
+		return currentlyPlayingVideoFile;
+	}
+	
 	private final class updateRunnable implements Runnable {
-		
 		private final MediaPlayer mediaPlayer;
-		
 		private updateRunnable(MediaPlayer mediaPlayer){
 			this.mediaPlayer = mediaPlayer;
-
 		}
 
 		@Override
@@ -169,7 +171,7 @@ public class Player {
 				//"--audio-visual=visual",
 		// Create a factory instance (once), you can keep a reference to this
 		//uncomment
-		//mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
+		mediaPlayerFactory = new MediaPlayerFactory(libvlcArgs);
 		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(frame);
         mediaPlayer = mediaPlayerFactory.newEmbeddedMediaPlayer(fullScreenStrategy);
 		mediaPlayer.setVideoSurface(mediaPlayerFactory.newVideoSurface(canvas));
@@ -709,9 +711,10 @@ public class Player {
 	}
 	
 	public void playSelectedVideoFile(File file){
-		currentlyPlayingFile = file.getAbsolutePath();
+		currentlyPlayingVideoFile = file;
+		currentlyPlaying = file.getAbsolutePath();
 		System.out.println("Playing");
-		mediaPlayer.prepareMedia(currentlyPlayingFile, new String[] {});
+		mediaPlayer.prepareMedia(currentlyPlaying, new String[] {});
 		mediaPlayer.play();
 		try {
 			Thread.sleep(200);
