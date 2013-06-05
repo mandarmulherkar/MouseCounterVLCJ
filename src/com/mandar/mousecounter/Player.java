@@ -89,7 +89,7 @@ public class Player {
 	private JLabel numberOfTimes = new JLabel("");
 
 	private JSpinner spinner = new JSpinner();
-	
+	private BehaviorPanel behaviorPanel;
 	
     public static void main(final String[] args) {
         NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
@@ -394,6 +394,7 @@ public class Player {
         gbc_spinner.insets = new Insets(0, 0, 5, 5);
         gbc_spinner.gridx = 2;
         gbc_spinner.gridy = 4;
+        spinner.setToolTipText("Type and Enter");
         activityButtonsPanel.add(spinner, gbc_spinner);
         
         spinner.addFocusListener(new FocusListener(){
@@ -608,18 +609,21 @@ public class Player {
         frame.getContentPane().add(videoControlPanel, BorderLayout.SOUTH);
         videoControlPanel.setLayout(new BorderLayout(0, 0));
         
-        BehaviorPanel behaviorPanel = new BehaviorPanel();
-        
-        videoControlPanel.add(behaviorPanel);
-        behaviorPanel.setLayout(new BorderLayout(0, 0));
+        JPanel panel_1 = new JPanel();
+        videoControlPanel.add(panel_1, BorderLayout.NORTH);
+        panel_1.setLayout(new BorderLayout(0, 0));
         
         positionSlider = new JSlider();
+        panel_1.add(positionSlider, BorderLayout.CENTER);
         positionSlider.setMaximum(1000);
         positionSlider.setValue(0);
-        behaviorPanel.add(positionSlider);
+        panel_1.add(timeLabel, BorderLayout.WEST);
         timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        behaviorPanel.add(timeLabel, BorderLayout.WEST);
+        behaviorPanel = new BehaviorPanel();
+        behaviorPanel.setToolTipText("Experimental!");
+        panel_1.add(behaviorPanel, BorderLayout.NORTH);
+        behaviorPanel.setLayout(new BorderLayout(0, 0));
         positionSlider.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -735,6 +739,7 @@ public class Player {
 		behaviorEvent = new BehaviorEvent();
 		behaviorEvent.setStartTime(mediaPlayer.getTime());
 		startTimeValue.setText(mediaPlayer.getTime()+"");
+		behaviorPanel.startVisualization(mediaPlayer.getPosition());
 	}
 
 	private void pausePlaying() {
@@ -749,6 +754,7 @@ public class Player {
 			stopTimeValue.setText(mediaPlayer.getTime()+"");
 			behaviorEvent.setDifference();
 			totalBehaviorTime.setText(behaviorEvent.getTotalTime()+"");
+			behaviorPanel.startVisualization(mediaPlayer.getPosition());
 		}
 	}
 

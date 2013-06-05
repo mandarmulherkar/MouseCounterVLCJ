@@ -33,7 +33,7 @@ public class AnalysisFileWriter {
 				try {
 					FileWriter fileWriter = new FileWriter(eventsFile);
 					bufferedWriter = new BufferedWriter(fileWriter);
-					if(bufferedWriter != null){
+					if(bufferedWriter != null && behaviorEventToWrite != null){
 						bufferedWriter.write(behaviorEventToWrite.toString());
 						bufferedWriter.newLine();
 						bufferedWriter.close();

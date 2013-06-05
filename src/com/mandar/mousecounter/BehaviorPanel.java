@@ -51,17 +51,16 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
             repaint(squareX,squareY,squareW+OFFSET,squareH+OFFSET);
         } 
     }
-	
-    public Dimension getPreferredSize() {
-        return new Dimension(250,80);
+
+	public Dimension getPreferredSize() {
+        return new Dimension(250,40);
     }
 
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);       
-
+        super.paintComponent(g);  
         g.setColor(Color.BLACK);
         g.drawLine(squareX, squareY, squareX, squareH);
-
+        
     }
 
 	@Override
@@ -83,13 +82,23 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 		dimension = ce.getComponent().getSize();
 		System.out.println(""+dimension.getHeight()+", "+dimension.getWidth());
 		
-		
 	}
 
 	@Override
 	public void componentShown(ComponentEvent arg0) {
 		System.out.println("Shown");
 		
+	}
+
+	public void startVisualization(float f) {
+		int x = (int) (dimension.getWidth() * f);
+		System.out.println("x co ord"+x);
+		squareX =x;
+		squareY =10;
+		squareX =x;
+		squareH = 30;
+		
+		repaint(x, 10, x, 30);
 	}  
 
 }
