@@ -7,6 +7,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -23,6 +25,7 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
     private int squareH = 30;
 
     private Dimension dimension;
+    private List<RectCoOrdinates>rectanglesList = new LinkedList<RectCoOrdinates>();
     
 	public BehaviorPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -59,7 +62,7 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  
         g.setColor(Color.BLACK);
-        g.drawLine(squareX, squareY, squareX, squareH);
+        g.fillRect(squareX, squareY, squareW, squareH);
         
     }
 
@@ -95,10 +98,21 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 		System.out.println("x co ord"+x);
 		squareX =x;
 		squareY =10;
-		squareX =x;
+		squareW = x;
 		squareH = 30;
 		
-		repaint(x, 10, x, 30);
+		repaint(squareX, squareY, squareW, squareH);
 	}  
 
+	public void endVisualization(float f) {
+		int x = (int) (dimension.getWidth() * f);
+		System.out.println("x co ord"+x);
+		squareX =x;
+		squareY =10;
+		squareW =x;
+		squareH = 30;
+		
+		repaint(squareX, squareY, squareW, squareH);
+	}
+	
 }

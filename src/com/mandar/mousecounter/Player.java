@@ -754,7 +754,7 @@ public class Player {
 			stopTimeValue.setText(mediaPlayer.getTime()+"");
 			behaviorEvent.setDifference();
 			totalBehaviorTime.setText(behaviorEvent.getTotalTime()+"");
-			behaviorPanel.startVisualization(mediaPlayer.getPosition());
+			behaviorPanel.endVisualization(mediaPlayer.getPosition());
 		}
 	}
 
