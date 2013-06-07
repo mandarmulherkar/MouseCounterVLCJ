@@ -23,7 +23,7 @@ public class BehaviorEvent {
 	
 	@Override
 	public String toString(){
-		return startTime +", "+ endTime +", "+ behavior;
+		return startTime +", "+ endTime +", "+ behavior +", "+totalTime+ ", "+behaviorCount;
 		
 	}
 

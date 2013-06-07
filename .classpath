@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="libs/platform-3.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/vlcj-2.3.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="icons/icons.jar"/>
+	<classpathentry kind="lib" path="libs/jxl.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

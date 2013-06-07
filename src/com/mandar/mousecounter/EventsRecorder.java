@@ -17,4 +17,10 @@ public class EventsRecorder {
 		}
 		
 	}
+
+	public void removeLastEvent() {
+		if(eventList != null && eventList.size() > 0){
+			eventList.remove(eventList.size() -1);
+		}
+	}
 }

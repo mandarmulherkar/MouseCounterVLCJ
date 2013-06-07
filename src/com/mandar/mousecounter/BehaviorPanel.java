@@ -19,6 +19,9 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private int xLeft;
+	private int xRight;
+	
 	private int squareX = 10;
     private int squareY = 10;
     private int squareW = 30;
@@ -26,6 +29,7 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 
     private Dimension dimension;
     private List<RectCoOrdinates>rectanglesList = new LinkedList<RectCoOrdinates>();
+    private RectCoOrdinates newXCoOrds;
     
 	public BehaviorPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -62,7 +66,9 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  
         g.setColor(Color.BLACK);
-        g.fillRect(squareX, squareY, squareW, squareH);
+        if(newXCoOrds != null){
+        	g.fillRect(newXCoOrds.getX1(), 10, newXCoOrds.getX2(), 20);
+        }
         
     }
 
@@ -96,23 +102,21 @@ public class BehaviorPanel extends JPanel implements ComponentListener{
 	public void startVisualization(float f) {
 		int x = (int) (dimension.getWidth() * f);
 		System.out.println("x co ord"+x);
-		squareX =x;
-		squareY =10;
-		squareW = x;
-		squareH = 30;
-		
-		repaint(squareX, squareY, squareW, squareH);
+		newXCoOrds = new RectCoOrdinates();
+		newXCoOrds.setX1(x);
 	}  
 
 	public void endVisualization(float f) {
 		int x = (int) (dimension.getWidth() * f);
 		System.out.println("x co ord"+x);
-		squareX =x;
-		squareY =10;
-		squareW =x;
-		squareH = 30;
+		if( newXCoOrds != null) {
+			newXCoOrds.setX2(x);
+			rectanglesList.add(newXCoOrds);
+			
+			repaint();
+			//newXCoOrds.getX1(), newXCoOrds.getY1(), newXCoOrds.getX2(), newXCoOrds.getY2());
+		}
 		
-		repaint(squareX, squareY, squareW, squareH);
 	}
 	
 }

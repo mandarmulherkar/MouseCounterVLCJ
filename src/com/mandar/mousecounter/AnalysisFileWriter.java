@@ -31,12 +31,13 @@ public class AnalysisFileWriter {
 			@Override
 			public void run() {
 				try {
-					FileWriter fileWriter = new FileWriter(eventsFile);
+					FileWriter fileWriter = new FileWriter(eventsFile, true);
 					bufferedWriter = new BufferedWriter(fileWriter);
 					if(bufferedWriter != null && behaviorEventToWrite != null){
 						bufferedWriter.write(behaviorEventToWrite.toString());
 						bufferedWriter.newLine();
 						bufferedWriter.close();
+						fileWriter.close();
 					}else {
 						System.out.println("Buffered Writer NULL!");
 					}
@@ -48,7 +49,5 @@ public class AnalysisFileWriter {
 		});
 		
 		fileWriterThread.start();
-
-		
 	}
 }

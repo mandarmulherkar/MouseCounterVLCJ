@@ -15,6 +15,10 @@ public class RectCoOrdinates {
 		this.yr = y2;
 	}
 	
+	public RectCoOrdinates() {
+		
+	}
+
 	public void setX1(int x){
 		this.xl = x;
 	}
@@ -31,4 +35,13 @@ public class RectCoOrdinates {
 	public int getX2(){
 		return xr;
 	}
+
+	public int getY2() {
+		return 0;
+	}
+
+	public int getY1() {
+		return 0;
+	}
+
 }

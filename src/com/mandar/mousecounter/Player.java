@@ -215,12 +215,12 @@ public class Player {
         JPanel activityButtonsPanel = new JPanel();
         activityButtonsPanel.setBorder(BorderFactory.createTitledBorder("Behavior"));
         GridBagConstraints gbc_panel_2 = new GridBagConstraints();
-        gbc_panel_2.gridheight = 7;
+        gbc_panel_2.gridheight = 8;
         gbc_panel_2.gridwidth = 2;
         gbc_panel_2.insets = new Insets(0, 0, 5, 0);
         gbc_panel_2.fill = GridBagConstraints.BOTH;
         gbc_panel_2.gridx = 1;
-        gbc_panel_2.gridy = 1;
+        gbc_panel_2.gridy = 0;
         panel.add(activityButtonsPanel, gbc_panel_2);
         GridBagLayout gbl_activityButtonsPanel = new GridBagLayout();
         gbl_activityButtonsPanel.columnWidths = new int[]{0, 0, 0, 0, 0};
@@ -375,9 +375,9 @@ public class Player {
         });
         btnNewBehavior.setIcon(new ImageIcon(Player.class.getResource("/icons/new.png")));
         GridBagConstraints gbc_btnNewBehavior = new GridBagConstraints();
+        gbc_btnNewBehavior.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewBehavior.insets = new Insets(0, 0, 5, 0);
         gbc_btnNewBehavior.gridwidth = 3;
-        gbc_btnNewBehavior.fill = GridBagConstraints.HORIZONTAL;
         gbc_btnNewBehavior.gridx = 2;
         gbc_btnNewBehavior.gridy = 3;
         activityButtonsPanel.add(btnNewBehavior, gbc_btnNewBehavior);
@@ -477,7 +477,8 @@ public class Player {
         gbc_btnPlaypauserecord.gridy = 5;
         activityButtonsPanel.add(btnPlaypauserecord, gbc_btnPlaypauserecord);
         
-        JButton button = new JButton("<< slower");
+        JButton button = new JButton("");
+        button.setIcon(new ImageIcon(Player.class.getResource("/icons/slow.png")));
         button.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		// slow it down!
@@ -487,12 +488,14 @@ public class Player {
         });
         
         GridBagConstraints gbc_button = new GridBagConstraints();
+        gbc_button.fill = GridBagConstraints.HORIZONTAL;
         gbc_button.insets = new Insets(0, 0, 5, 5);
         gbc_button.gridx = 1;
         gbc_button.gridy = 6;
         activityButtonsPanel.add(button, gbc_button);
         
-        JButton btnNewButton = new JButton("faster >>");
+        JButton btnNewButton = new JButton("");
+        btnNewButton.setIcon(new ImageIcon(Player.class.getResource("/icons/fast.png")));
         btnNewButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		// speed it up!
@@ -501,10 +504,37 @@ public class Player {
         	}
         });
         GridBagConstraints gbc_btnNewButton1 = new GridBagConstraints();
+        gbc_btnNewButton1.fill = GridBagConstraints.BOTH;
         gbc_btnNewButton1.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton1.gridx = 2;
         gbc_btnNewButton1.gridy = 6;
         activityButtonsPanel.add(btnNewButton, gbc_btnNewButton1);
+        
+        JButton btnStop = new JButton("Pause");
+        btnStop.setIcon(new ImageIcon(Player.class.getResource("/icons/pause.png")));
+        GridBagConstraints gbc_btnStop = new GridBagConstraints();
+        gbc_btnStop.fill = GridBagConstraints.BOTH;
+        gbc_btnStop.insets = new Insets(0, 0, 5, 5);
+        gbc_btnStop.gridx = 1;
+        gbc_btnStop.gridy = 7;
+        activityButtonsPanel.add(btnStop, gbc_btnStop);
+        
+        JButton btnHistory = new JButton("Last");
+        btnHistory.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		if(behaviorEvent != null){
+        			eventsRecorder.removeLastEvent();
+        			resetLabels();
+        		}
+        	}
+        });
+        btnHistory.setIcon(new ImageIcon(Player.class.getResource("/icons/cancel.png")));
+        GridBagConstraints gbc_btnHistory = new GridBagConstraints();
+        gbc_btnHistory.fill = GridBagConstraints.BOTH;
+        gbc_btnHistory.insets = new Insets(0, 0, 5, 5);
+        gbc_btnHistory.gridx = 2;
+        gbc_btnHistory.gridy = 7;
+        activityButtonsPanel.add(btnHistory, gbc_btnHistory);
         
         JLabel label = new JLabel("");
         GridBagConstraints gbc_label = new GridBagConstraints();
@@ -523,9 +553,9 @@ public class Player {
         gbc_panel_1.gridy = 8;
         panel.add(currentValuesPanel, gbc_panel_1);
         GridBagLayout gbl_currentValuesPanel = new GridBagLayout();
-        gbl_currentValuesPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
+        gbl_currentValuesPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0};
         gbl_currentValuesPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-        gbl_currentValuesPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_currentValuesPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_currentValuesPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         currentValuesPanel.setLayout(gbl_currentValuesPanel);
         
