@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="MacOSVLCJ"/>
+	<classpathentry kind="src" path="MacOS"/>
 	<classpathentry kind="lib" path="libs/jna-3.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/platform-3.5.1.jar"/>
 	<classpathentry kind="lib" path="libs/vlcj-2.3.0-SNAPSHOT.jar"/>

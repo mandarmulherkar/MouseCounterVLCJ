@@ -57,11 +57,18 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
+import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
+import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
+import com.mandar.mousecounter.visualization.BehaviorPanel;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 public class Player {
 
+	private static final int FRAME_START_LOC_Y = 100;
+	private static final int FRAME_START_LOC_X = 100;
+	private static final int FRAME_WIDTH = 720;
+	private static final int FRAME_HEIGHT = 720;
 	private static EmbeddedMediaPlayer mediaPlayer = null;
 	private MediaPlayerFactory mediaPlayerFactory = null;
 	private MenuClass menuClass;
@@ -683,8 +690,8 @@ public class Player {
 //        videoslider.setValue(0);
 //        behaviorPanel.add(videoslider, BorderLayout.SOUTH);
         
-        frame.setLocation(100, 100);
-        frame.setSize(720, 650);
+        frame.setLocation(FRAME_START_LOC_X, FRAME_START_LOC_Y);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 	}

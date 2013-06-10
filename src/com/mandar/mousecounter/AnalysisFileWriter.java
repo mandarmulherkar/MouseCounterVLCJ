@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.mandar.mousecounter.Player;
+import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
+
 public class AnalysisFileWriter {
 
 	private static String eventsFile = "results.csv";

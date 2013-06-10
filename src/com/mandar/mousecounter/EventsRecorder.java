@@ -3,6 +3,9 @@ package com.mandar.mousecounter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
+import com.mandar.mousecounter.filewriter.AnalysisFileWriter;
+
 public class EventsRecorder {
 
 	private static List<BehaviorEvent> eventList = new ArrayList<BehaviorEvent>();

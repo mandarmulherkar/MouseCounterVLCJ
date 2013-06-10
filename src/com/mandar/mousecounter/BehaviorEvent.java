@@ -1,5 +1,7 @@
 package com.mandar.mousecounter;
 
+import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
+
 public class BehaviorEvent {
 
 	private long startTime;
