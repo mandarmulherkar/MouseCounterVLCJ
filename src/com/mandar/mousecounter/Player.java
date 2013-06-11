@@ -31,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -59,9 +60,16 @@ import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
 import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
-import com.mandar.mousecounter.visualization.BehaviorPanel;
+import com.mandar.mousecounter.filewriter.LogFileWriter;
+import com.mandar.mousecounter.visualization.VisualizationPanel;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
+
+/**
+ * 
+ * @author mulherka
+ * https://developers.google.com/appengine/docs/java/blobstore/
+ */
 
 public class Player {
 
@@ -96,10 +104,21 @@ public class Player {
 	private JLabel numberOfTimes = new JLabel("");
 
 	private JSpinner spinner = new JSpinner();
-	private BehaviorPanel behaviorPanel;
+	private JPanel behaviorPanel;
+	private VisualizationPanel visualizationPanel;
 	
     public static void main(final String[] args) {
-        NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
+        
+    	try {
+    		System.out.println(new java.io.File( "." ).getCanonicalPath()+"");
+			LogFileWriter.writeToFile(new java.io.File( "." ).getCanonicalPath()+", "+System.getProperty("user.dir"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	System.out.println("DIR: "+System.getProperty("user.dir"));
+    	
+    	NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "MacOS/lib");
+        //NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "Contents/Resources/vlcj/lib");
         Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -451,8 +470,7 @@ public class Player {
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+				System.out.println("release");
 			}
         	
         });
@@ -657,10 +675,16 @@ public class Player {
         panel_1.add(timeLabel, BorderLayout.WEST);
         timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        behaviorPanel = new BehaviorPanel();
+        behaviorPanel = new JPanel();
         behaviorPanel.setToolTipText("Experimental!");
         panel_1.add(behaviorPanel, BorderLayout.NORTH);
         behaviorPanel.setLayout(new BorderLayout(0, 0));
+        
+        JButton btnSort = new JButton("Sort");
+        behaviorPanel.add(btnSort, BorderLayout.WEST);
+        
+        visualizationPanel = new VisualizationPanel();
+        behaviorPanel.add(visualizationPanel, BorderLayout.CENTER);
         positionSlider.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -704,7 +728,7 @@ public class Player {
 			if(!mousePressedPlaying) {
                 try {
                         // Half a second probably gets an iframe
-                        Thread.sleep(500);  
+                        Thread.sleep(300);  
                 } 
                 catch(InterruptedException e) {
                         // Don't care if unblocked early
@@ -758,9 +782,8 @@ public class Player {
 		mediaPlayer.prepareMedia(currentlyPlaying, new String[] {});
 		mediaPlayer.play();
 		try {
-			Thread.sleep(200);
+			Thread.sleep(300);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		mediaPlayer.pause();
@@ -776,7 +799,7 @@ public class Player {
 		behaviorEvent = new BehaviorEvent();
 		behaviorEvent.setStartTime(mediaPlayer.getTime());
 		startTimeValue.setText(mediaPlayer.getTime()+"");
-		behaviorPanel.startVisualization(mediaPlayer.getPosition());
+		visualizationPanel.startVisualization(mediaPlayer.getPosition());
 	}
 
 	private void pausePlaying() {
@@ -791,7 +814,7 @@ public class Player {
 			stopTimeValue.setText(mediaPlayer.getTime()+"");
 			behaviorEvent.setDifference();
 			totalBehaviorTime.setText(behaviorEvent.getTotalTime()+"");
-			behaviorPanel.endVisualization(mediaPlayer.getPosition());
+			visualizationPanel.endVisualization(mediaPlayer.getPosition());
 		}
 	}
 
