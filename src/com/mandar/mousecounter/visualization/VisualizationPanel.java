@@ -123,6 +123,7 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 		behaviorInfo = new BehaviorInfo();
 		behaviorInfo.setX1(f);
 		startX = true;
+		reset = false; //false now.
 		repaint();
 	}  
 

@@ -65,6 +65,7 @@ import com.mandar.mousecounter.filewriter.LogFileWriter;
 import com.mandar.mousecounter.visualization.VisualizationPanel;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * 
@@ -263,6 +264,8 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.LICK);
         			behaviorValue.setText(BehaviorEnum.LICK.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.LICK);
+        			setBehaviorCount();
+        			
         		}
         	}
         });
@@ -281,6 +284,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.FLINCH);
         			behaviorValue.setText(BehaviorEnum.FLINCH.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.FLINCH);
+        			setBehaviorCount();
         		}
         	}
         });
@@ -299,6 +303,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.SCRATCH);
         			behaviorValue.setText(BehaviorEnum.SCRATCH.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.SCRATCH);
+        			setBehaviorCount();
         		}
         	}
         });
@@ -317,6 +322,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.SNIFF);
         			behaviorValue.setText(BehaviorEnum.SNIFF.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.SNIFF);
+        			setBehaviorCount();
         		}
         	}
         });
@@ -335,6 +341,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.GUARD);
         			behaviorValue.setText(BehaviorEnum.GUARD.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.GUARD);
+        			setBehaviorCount();
         		}
         	}
         });
@@ -353,6 +360,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.LIFT);
         			behaviorValue.setText(BehaviorEnum.LIFT.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.LIFT);
+        			setBehaviorCount();
         		}
         		
         	}
@@ -372,6 +380,7 @@ public class Player {
         			behaviorEvent.addBehavior(BehaviorEnum.WIPE);
         			behaviorValue.setText(BehaviorEnum.WIPE.toString());
         			visualizationPanel.recordBehavior(BehaviorEnum.WIPE);
+        			setBehaviorCount();
         		}
         	}
         });
@@ -398,11 +407,13 @@ public class Player {
         		if(null != newBehavior){
         				behaviorEvent.addNewBehavior(newBehavior);
         				behaviorValue.setText(newBehavior);
+            			setBehaviorCount();
         		}else{
         			if(behaviorEvent != null){
         				behaviorEvent.addNewBehavior("NoName");
     					behaviorValue.setText("NoName");
     					visualizationPanel.recordBehavior(BehaviorEnum.NONE);
+            			setBehaviorCount();
         			}
         		}
         	}
@@ -428,6 +439,7 @@ public class Player {
         gbc_spinner.insets = new Insets(0, 0, 5, 5);
         gbc_spinner.gridx = 2;
         gbc_spinner.gridy = 4;
+        spinner.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
         spinner.setToolTipText("Type and Enter");
         activityButtonsPanel.add(spinner, gbc_spinner);
         
@@ -731,6 +743,15 @@ public class Player {
 	}
 	
 	
+	protected void setBehaviorCount() {
+		numberOfTimes.setText(spinner.getValue()+"");
+		if(behaviorEvent != null){
+			behaviorEvent.setTotalCount(Integer.parseInt(spinner.getValue()+""));
+		}
+	
+		
+	}
+
 	protected void updateUIState() {
 		if(!mediaPlayer.isPlaying()){
 			mediaPlayer.play();
@@ -842,12 +863,12 @@ public class Player {
 
 	private void resetLabels() {
 		
-		startTimeValue.setText("");
-		stopTimeValue.setText("");
-		totalBehaviorTime.setText("");
-		behaviorValue.setText("");
-		numberOfTimes.setText("");
-		spinner.setValue(0);
+		startTimeValue.setText("--");
+		stopTimeValue.setText("--");
+		totalBehaviorTime.setText("--");
+		behaviorValue.setText("--");
+		numberOfTimes.setText("--");
+		spinner.setValue(1);
 		
 	}
 }
