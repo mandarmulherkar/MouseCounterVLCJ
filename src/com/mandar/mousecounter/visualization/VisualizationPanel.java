@@ -41,11 +41,14 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
         g.setColor(Color.BLACK);
         if(behaviorInfo != null){
         	if(startX){
-        		g.drawLine(behaviorInfo.getX1(), 0, behaviorInfo.getX1(), 40);
+        		int x = (int) (dimension.getWidth() * behaviorInfo.getX1());
+        		g.drawLine(x, 0, x, 40);
         	}
     		for(BehaviorInfo coords : rectanglesList){
+    			int x1 = (int) (dimension.getWidth() * coords.getX1());
+    			int x2 = (int) (dimension.getWidth() * coords.getX2());
     			g.setColor(getMappedColor(coords));
-    			g.fillRect(coords.getX1(), 0, coords.getX2() - coords.getX1(), 40);
+    			g.fillRect(x1, 0, (x2 - x1), 40);
     		}
         }
     }
@@ -108,23 +111,20 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 	}
 
 	public void startVisualization(float f) {
-		int x = (int) (dimension.getWidth() * f);
-		System.out.println("x1 "+x);
+		System.out.println("x1 "+f);
 		behaviorInfo = new BehaviorInfo();
-		behaviorInfo.setX1(x);
+		behaviorInfo.setX1(f);
 		startX = true;
 		repaint();
 	}  
 
 	public void endVisualization(float f) {
-		int x = (int) (dimension.getWidth() * f);
-		System.out.println("x2 "+x);
+		System.out.println("x2 "+f);
 		if( behaviorInfo != null) {
-			behaviorInfo.setX2(x);
+			behaviorInfo.setX2(f);
 			rectanglesList.add(behaviorInfo);
 			startX = false;
 			repaint();
-			//newXCoOrds.getX1(), newXCoOrds.getY1(), newXCoOrds.getX2(), newXCoOrds.getY2());
 		}
 	}
 		

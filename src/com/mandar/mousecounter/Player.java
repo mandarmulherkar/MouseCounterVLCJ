@@ -60,6 +60,7 @@ import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
 import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
+import com.mandar.mousecounter.behaviorevent.EventsRecorder;
 import com.mandar.mousecounter.filewriter.LogFileWriter;
 import com.mandar.mousecounter.visualization.VisualizationPanel;
 import com.sun.jna.Native;

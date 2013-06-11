@@ -4,12 +4,12 @@ import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
 
 public class BehaviorInfo {
 
-	private int xl;
-	private int xr;
+	private float xl;
+	private float xr;
 	
 	private BehaviorEnum behaviorEnum;
 	
-	public BehaviorInfo(int x1, int y1, int x2, int y2){
+	public BehaviorInfo(float x1, int y1, float x2, int y2){
 		
 		this.xl = x1;
 		this.xr = x2;
@@ -19,20 +19,20 @@ public class BehaviorInfo {
 		
 	}
 
-	public void setX1(int x){
+	public void setX1(float x){
 		this.xl = x;
 	}
 	
-	public void setX2(int x){
+	public void setX2(float x){
 		this.xr = x;
 	}
 	
 	
-	public int getX1(){
+	public float getX1(){
 		return xl;
 	}
 	
-	public int getX2(){
+	public float getX2(){
 		return xr;
 	}
 
