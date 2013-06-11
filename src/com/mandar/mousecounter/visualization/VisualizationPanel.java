@@ -25,6 +25,7 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
     private Dimension dimension = new Dimension(BEHAVIOR_PANEL_WIDTH,BEHAVIOR_PANEL_HEIGHT);
     private List<BehaviorInfo>rectanglesList = new LinkedList<BehaviorInfo>();
     private BehaviorInfo behaviorInfo;
+	private static boolean reset = false;
     
     private static boolean startX = true;
 	public VisualizationPanel() {
@@ -39,10 +40,17 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  
         g.setColor(Color.BLACK);
+        
+        if(reset == true){
+        	g.drawLine(0, 0, 0, 0);
+        	reset = false;
+        	return;
+        }
+        
         if(behaviorInfo != null){
         	if(startX){
         		int x = (int) (dimension.getWidth() * behaviorInfo.getX1());
-        		g.drawLine(x, 0, x, 40);
+        		g.drawLine(x, 0, x, BEHAVIOR_PANEL_HEIGHT);
         	}
     		for(BehaviorInfo coords : rectanglesList){
     			int x1 = (int) (dimension.getWidth() * coords.getX1());
@@ -133,7 +141,14 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 			behaviorInfo.setBehaviorEnum(be);
 		}
 		repaint();
-			
 	}
-			
+
+	public static void resetPanel() {
+		reset = true;
+	}
+
+	public void removeLastVisualization() {
+		rectanglesList.remove(rectanglesList.size()-1);
+		
+	}
 }

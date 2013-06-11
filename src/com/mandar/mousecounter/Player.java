@@ -557,6 +557,8 @@ public class Player {
         	public void actionPerformed(ActionEvent arg0) {
         		if(behaviorEvent != null){
         			eventsRecorder.removeLastEvent();
+        			visualizationPanel.removeLastVisualization();
+        			visualizationPanel.recordBehavior(BehaviorEnum.NONE);
         			resetLabels();
         		}
         	}
@@ -784,6 +786,8 @@ public class Player {
 	}
 	
 	public void playSelectedVideoFile(File file){
+		
+		VisualizationPanel.resetPanel();
 		currentlyPlayingVideoFile = file;
 		currentlyPlaying = file.getAbsolutePath();
 		System.out.println("Playing");
