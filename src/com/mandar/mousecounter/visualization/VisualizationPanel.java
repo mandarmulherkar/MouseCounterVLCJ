@@ -21,11 +21,12 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 	private static final int BEHAVIOR_PANEL_HEIGHT = 40;
 
 	private static final long serialVersionUID = 1L;
-
+	
     private Dimension dimension = new Dimension(BEHAVIOR_PANEL_WIDTH,BEHAVIOR_PANEL_HEIGHT);
     private List<RectCoOrdinates>rectanglesList = new LinkedList<RectCoOrdinates>();
     private RectCoOrdinates newXCoOrds;
     
+    private static boolean startX = true;
 	public VisualizationPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
         addComponentListener(this);
@@ -39,13 +40,13 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
         super.paintComponent(g);  
         g.setColor(Color.BLACK);
         if(newXCoOrds != null){
-        	g.fillRect(newXCoOrds.getX1(), 0, newXCoOrds.getX2() - newXCoOrds.getX1(), 40);
-        	
-        	for(RectCoOrdinates coords : rectanglesList){
-        		g.fillRect(coords.getX1(), 0, coords.getX2() - coords.getX1(), 40);
+        	if(startX){
+        		g.drawLine(newXCoOrds.getX1(), 0, newXCoOrds.getX1(), 40);
         	}
-//        	g.drawLine(PANEL_PADDING, 0, PANEL_PADDING, 40);
-//        	g.drawLine((int)(dimension.getWidth()-PANEL_PADDING), 0, (int)dimension.getWidth()-PANEL_PADDING, 40);
+    		for(RectCoOrdinates coords : rectanglesList){
+    			g.fillRect(coords.getX1(), 0, coords.getX2() - coords.getX1(), 40);
+    		}
+        	
         }
     }
 
@@ -81,6 +82,7 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 		System.out.println("x1 "+x);
 		newXCoOrds = new RectCoOrdinates();
 		newXCoOrds.setX1(x);
+		startX = true;
 		repaint();
 	}  
 
@@ -90,7 +92,7 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 		if( newXCoOrds != null) {
 			newXCoOrds.setX2(x);
 			rectanglesList.add(newXCoOrds);
-			
+			startX = false;
 			repaint();
 			//newXCoOrds.getX1(), newXCoOrds.getY1(), newXCoOrds.getX2(), newXCoOrds.getY2());
 		}
