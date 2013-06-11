@@ -5,13 +5,13 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+
+import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
 
 
 public class VisualizationPanel extends JPanel implements ComponentListener{
@@ -23,8 +23,8 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 	private static final long serialVersionUID = 1L;
 	
     private Dimension dimension = new Dimension(BEHAVIOR_PANEL_WIDTH,BEHAVIOR_PANEL_HEIGHT);
-    private List<RectCoOrdinates>rectanglesList = new LinkedList<RectCoOrdinates>();
-    private RectCoOrdinates newXCoOrds;
+    private List<BehaviorInfo>rectanglesList = new LinkedList<BehaviorInfo>();
+    private BehaviorInfo behaviorInfo;
     
     private static boolean startX = true;
 	public VisualizationPanel() {
@@ -39,16 +39,46 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  
         g.setColor(Color.BLACK);
-        if(newXCoOrds != null){
+        if(behaviorInfo != null){
         	if(startX){
-        		g.drawLine(newXCoOrds.getX1(), 0, newXCoOrds.getX1(), 40);
+        		g.drawLine(behaviorInfo.getX1(), 0, behaviorInfo.getX1(), 40);
         	}
-    		for(RectCoOrdinates coords : rectanglesList){
+    		for(BehaviorInfo coords : rectanglesList){
+    			g.setColor(getMappedColor(coords));
     			g.fillRect(coords.getX1(), 0, coords.getX2() - coords.getX1(), 40);
     		}
-        	
         }
     }
+
+	private Color getMappedColor(BehaviorInfo coords) {
+
+		if(null == coords) {
+			return Color.black;
+		}
+		if(null == coords.getBehaviorEnum()){
+			return Color.black;
+		}
+		switch(coords.getBehaviorEnum()){
+		case LICK:
+			return Color.cyan;
+		case SCRATCH: 
+			return Color.green;
+		case GUARD:
+			return Color.magenta;
+		case WIPE: 
+			return Color.orange;
+		case FLINCH:
+			return Color.red;
+		case SNIFF: 
+			return Color.yellow;
+		case LIFT:
+			return Color.pink;
+		case NONE:
+			return Color.darkGray;
+		default:
+			return Color.black;
+		}
+	}
 
 	@Override
 	public void componentHidden(ComponentEvent arg0) {
@@ -80,8 +110,8 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 	public void startVisualization(float f) {
 		int x = (int) (dimension.getWidth() * f);
 		System.out.println("x1 "+x);
-		newXCoOrds = new RectCoOrdinates();
-		newXCoOrds.setX1(x);
+		behaviorInfo = new BehaviorInfo();
+		behaviorInfo.setX1(x);
 		startX = true;
 		repaint();
 	}  
@@ -89,14 +119,21 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 	public void endVisualization(float f) {
 		int x = (int) (dimension.getWidth() * f);
 		System.out.println("x2 "+x);
-		if( newXCoOrds != null) {
-			newXCoOrds.setX2(x);
-			rectanglesList.add(newXCoOrds);
+		if( behaviorInfo != null) {
+			behaviorInfo.setX2(x);
+			rectanglesList.add(behaviorInfo);
 			startX = false;
 			repaint();
 			//newXCoOrds.getX1(), newXCoOrds.getY1(), newXCoOrds.getX2(), newXCoOrds.getY2());
 		}
-		
 	}
-	
+		
+	public void recordBehavior(BehaviorEnum be) {
+		if(null != behaviorInfo){
+			behaviorInfo.setBehaviorEnum(be);
+		}
+		repaint();
+			
+	}
+			
 }

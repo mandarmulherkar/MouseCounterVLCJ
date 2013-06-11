@@ -261,6 +261,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.LICK);
         			behaviorValue.setText(BehaviorEnum.LICK.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.LICK);
         		}
         	}
         });
@@ -278,6 +279,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.FLINCH);
         			behaviorValue.setText(BehaviorEnum.FLINCH.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.FLINCH);
         		}
         	}
         });
@@ -295,7 +297,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.SCRATCH);
         			behaviorValue.setText(BehaviorEnum.SCRATCH.toString());
-        			
+        			visualizationPanel.recordBehavior(BehaviorEnum.SCRATCH);
         		}
         	}
         });
@@ -313,6 +315,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.SNIFF);
         			behaviorValue.setText(BehaviorEnum.SNIFF.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.SNIFF);
         		}
         	}
         });
@@ -330,6 +333,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.GUARD);
         			behaviorValue.setText(BehaviorEnum.GUARD.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.GUARD);
         		}
         	}
         });
@@ -347,6 +351,7 @@ public class Player {
         		if(null != behaviorEvent){	
         			behaviorEvent.addBehavior(BehaviorEnum.LIFT);
         			behaviorValue.setText(BehaviorEnum.LIFT.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.LIFT);
         		}
         		
         	}
@@ -365,6 +370,7 @@ public class Player {
         		if(null != behaviorEvent){
         			behaviorEvent.addBehavior(BehaviorEnum.WIPE);
         			behaviorValue.setText(BehaviorEnum.WIPE.toString());
+        			visualizationPanel.recordBehavior(BehaviorEnum.WIPE);
         		}
         	}
         });
@@ -395,6 +401,7 @@ public class Player {
         			if(behaviorEvent != null){
         				behaviorEvent.addNewBehavior("NoName");
     					behaviorValue.setText("NoName");
+    					visualizationPanel.recordBehavior(BehaviorEnum.NONE);
         			}
         		}
         	}

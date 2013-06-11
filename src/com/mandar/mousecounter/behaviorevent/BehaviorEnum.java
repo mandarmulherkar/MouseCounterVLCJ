@@ -8,5 +8,6 @@ public enum BehaviorEnum {
 	WIPE, 
 	FLINCH,
 	SNIFF, 
-	LIFT
+	LIFT,
+	NONE
 }
