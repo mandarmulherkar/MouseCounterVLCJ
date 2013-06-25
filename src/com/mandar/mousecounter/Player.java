@@ -68,7 +68,7 @@ import com.sun.jna.NativeLibrary;
 import javax.swing.SpinnerNumberModel;
 
 /**
- * 
+ * The main Player class.
  * @author mulherka
  * https://developers.google.com/appengine/docs/java/blobstore/
  */
@@ -108,7 +108,7 @@ public class Player {
 	private JSpinner spinner = new JSpinner();
 	private JPanel behaviorPanel;
 	private VisualizationPanel visualizationPanel;
-	
+	private static boolean sortedVisuals = true;
     public static void main(final String[] args) {
         
     	try {
@@ -703,6 +703,19 @@ public class Player {
         behaviorPanel.setLayout(new BorderLayout(0, 0));
         
         JButton btnSort = new JButton("Sort");
+        btnSort.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		if(null != visualizationPanel){
+	        		if(sortedVisuals){
+	        			visualizationPanel.sortValues();
+	        			sortedVisuals = false;
+	        		}else {
+	        			visualizationPanel.resetVisual();
+	        			sortedVisuals = true;
+	        		}
+        		}
+        	}
+        });
         behaviorPanel.add(btnSort, BorderLayout.WEST);
         
         visualizationPanel = new VisualizationPanel();

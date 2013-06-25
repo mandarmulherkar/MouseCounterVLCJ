@@ -45,6 +45,9 @@ public class BehaviorInfo {
 	}
 
 	public BehaviorEnum getBehaviorEnum() {
+		if(behaviorEnum == null){
+			return BehaviorEnum.NONE;
+		}
 		return behaviorEnum;
 	}
 

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,18 +17,21 @@ import com.mandar.mousecounter.behaviorevent.BehaviorEnum;
 
 public class VisualizationPanel extends JPanel implements ComponentListener{
 
-	private static final int PANEL_PADDING = 15;
+	private static final int RECT_Y2 = 40;
+	private static final int RECT_Y1 = 0;
 	private static final int BEHAVIOR_PANEL_WIDTH = 633;
 	private static final int BEHAVIOR_PANEL_HEIGHT = 40;
 
 	private static final long serialVersionUID = 1L;
+	private List<BehaviorInfo> rectanglesListCopy;
 	
     private Dimension dimension = new Dimension(BEHAVIOR_PANEL_WIDTH,BEHAVIOR_PANEL_HEIGHT);
-    private List<BehaviorInfo>rectanglesList = new LinkedList<BehaviorInfo>();
+    private static List<BehaviorInfo>rectanglesList = new LinkedList<BehaviorInfo>();
     private BehaviorInfo behaviorInfo;
 	private static boolean reset = false;
     
     private static boolean startX = true;
+	private static boolean needsToSort = false;
 	public VisualizationPanel() {
         setBorder(BorderFactory.createLineBorder(Color.black));
         addComponentListener(this);
@@ -47,6 +51,25 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
         	return;
         }
         
+        if(needsToSort){
+        	int currentX = 0;
+    		for(BehaviorInfo coords : rectanglesListCopy){
+    			int x1 = (int) (dimension.getWidth() * coords.getX1());
+    			int x2 = (int) (dimension.getWidth() * coords.getX2());
+    			g.setColor(getMappedColor(coords));
+    			g.fillRect(currentX, RECT_Y1, (x2 - x1), RECT_Y2);
+    			currentX = currentX + (x2 - x1);
+    			
+    			
+    			
+    			g.setColor(Color.BLACK);
+    			g.drawLine(currentX, RECT_Y1, currentX, RECT_Y2);
+    		
+    			currentX +=1;
+    		}
+    		return;
+        }
+        
         if(behaviorInfo != null){
         	if(startX){
         		int x = (int) (dimension.getWidth() * behaviorInfo.getX1());
@@ -56,7 +79,7 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
     			int x1 = (int) (dimension.getWidth() * coords.getX1());
     			int x2 = (int) (dimension.getWidth() * coords.getX2());
     			g.setColor(getMappedColor(coords));
-    			g.fillRect(x1, 0, (x2 - x1), 40);
+    			g.fillRect(x1, RECT_Y1, (x2 - x1), RECT_Y2);
     		}
         }
     }
@@ -150,6 +173,29 @@ public class VisualizationPanel extends JPanel implements ComponentListener{
 
 	public void removeLastVisualization() {
 		rectanglesList.remove(rectanglesList.size()-1);
+		
+	}
+
+	public void sortValues() {
+		BehaviorComparator bc = new BehaviorComparator();
+		rectanglesListCopy = new LinkedList<BehaviorInfo>(rectanglesList);
+		Collections.sort(rectanglesListCopy, bc);
+		
+		for(BehaviorInfo coords : rectanglesList){
+			System.out.println(coords.getBehaviorEnum().ordinal());
+		}
+		
+		System.out.println("After sorting");
+		for(BehaviorInfo coords : rectanglesListCopy){
+			System.out.println(coords.getBehaviorEnum().ordinal());
+		}
+		
+		needsToSort = true;
+		repaint();
+	}
+
+	public void resetVisual() {
+		// TODO Auto-generated method stub
 		
 	}
 }
