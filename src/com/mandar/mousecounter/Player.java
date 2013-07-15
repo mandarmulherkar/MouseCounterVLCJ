@@ -90,6 +90,8 @@ public class Player {
 	private JSlider positionSlider;
 	private String currentlyPlaying;
 	private static File currentlyPlayingVideoFile = null;
+	private static File saveFileName = null;
+	private static File playingFileName = null;
 	private float videoPlayingRate = 1.0f;
 	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 	
@@ -882,6 +884,25 @@ public class Player {
 		behaviorValue.setText("--");
 		numberOfTimes.setText("--");
 		spinner.setValue(1);
+		
+	}
+
+	public static void setCurrentSaveFile(File currentFilename) {
+		saveFileName = currentFilename;
+		
+	}
+	
+	public static File getCurrentSaveFile() {
+		return saveFileName;
+		
+	}
+
+	public static void setCurrentPlayingFile(File currentFilename) {
+		playingFileName = currentFilename;
+	}
+
+	public static File getCurrentPlayingFile() {
+		return playingFileName;
 		
 	}
 }

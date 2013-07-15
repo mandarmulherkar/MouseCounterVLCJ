@@ -4,21 +4,33 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.UUID;
 
 import com.mandar.mousecounter.behaviorevent.BehaviorEvent;
 import com.mandar.mousecounter.Player;
 
 public class AnalysisFileWriter {
 
-	private static String eventsFile = "results.csv";
+	private static String eventsFile;
 	private static BehaviorEvent behaviorEventToWrite;
 	private static BufferedWriter bufferedWriter;
-	
+	private static File saveToFile;
 	public static void writeToFile(BehaviorEvent behaviorEvent){
 		behaviorEventToWrite = behaviorEvent;
+
 		File file = Player.getCurrentlyPlayingVideoFile();
+		saveToFile = Player.getCurrentSaveFile();
 		
 		if(null != file){
+			
+			if(saveToFile != null){
+				eventsFile = saveToFile.getName()+".csv";
+			} else{
+				eventsFile = file.getAbsolutePath()+".csv";
+			}
+			
+			System.out.println("Saving to File "+eventsFile);
+			
 			writeEventToFile();
 		}else{
 			return;
@@ -27,8 +39,6 @@ public class AnalysisFileWriter {
 	}
 
 	private static void writeEventToFile() {
-		
-		
 		Thread fileWriterThread = new Thread(new Runnable(){
 
 			@Override

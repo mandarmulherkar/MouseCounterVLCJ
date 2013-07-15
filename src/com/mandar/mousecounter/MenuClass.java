@@ -17,6 +17,7 @@ public class MenuClass {
 	private static JFrame frame;
 	private static Player player;
 	private File currentFilename;
+	private File currentDirectory;
 	
 	public MenuClass(JFrame frame, Player player){
 		this.frame = frame;
@@ -40,6 +41,30 @@ public class MenuClass {
 				openFile();
 			}
     	});
+    	
+    	JMenuItem menuSaveAnalysis = new JMenuItem("Save");
+    	menuFile.add(menuSaveAnalysis);
+    	menuSaveAnalysis.addActionListener(new ActionListener(){
+    		@Override
+			public void actionPerformed(ActionEvent e) {
+				saveFile();
+			}
+    	});
+	}
+
+	protected void saveFile() {
+		JFileChooser fileChooser = new JFileChooser();
+		// Demonstrate "Save" dialog:
+		int rVal = fileChooser.showSaveDialog(frame);
+		if (rVal == JFileChooser.APPROVE_OPTION) {
+			currentFilename = fileChooser.getSelectedFile();
+			Player.setCurrentSaveFile(currentFilename);
+		}
+      
+		if (rVal == JFileChooser.CANCEL_OPTION) {
+			//filename.setText("You pressed cancel");
+			//dir.setText("");
+		}
 	}
 
 	protected void openFile() {
@@ -47,7 +72,8 @@ public class MenuClass {
 		int retVal = fileChooser.showOpenDialog(frame);
 		if(retVal == JFileChooser.APPROVE_OPTION){
 			currentFilename = fileChooser.getSelectedFile();
-			System.out.println(""+currentFilename.getAbsolutePath());
+			System.out.println("Current File "+currentFilename.getAbsolutePath());
+			Player.setCurrentPlayingFile(currentFilename);
 			player.playSelectedVideoFile(currentFilename);
 		}else{
 			System.out.println("File open cancelled.");
